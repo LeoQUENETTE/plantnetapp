@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Plantnetapp"
         tools:targetApi="31" >
-        <activity android:name=".src.front.MainActivity"
+        <activity android:name=".front.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
