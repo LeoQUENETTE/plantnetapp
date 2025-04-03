@@ -1,4 +1,4 @@
-package com.example.plantnetapp.src.back;
+package com.example.plantnetapp.back;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
