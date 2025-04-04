@@ -5,12 +5,15 @@ import android.database.sqlite.SQLiteDatabase;
 public class UserTable extends Table{
     private static UserTable INSTANCE = null;
     public static String TABLE_NAME = "User";
-    private UserTable(SQLiteDatabase db) {
+    private UserTable(SQLiteDatabase db,  boolean tableExist) {
         database = db;
+        if (!tableExist){
+            createTable();
+        }
     }
-    public static void createInstance(SQLiteDatabase db){
+    public static void createInstance(SQLiteDatabase db, boolean tableExist){
         if (INSTANCE == null){
-            INSTANCE = new UserTable(db);
+            INSTANCE = new UserTable(db, tableExist);
         }
     }
 

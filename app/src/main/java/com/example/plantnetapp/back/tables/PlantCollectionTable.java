@@ -5,12 +5,15 @@ import android.database.sqlite.SQLiteDatabase;
 public class PlantCollectionTable extends Table{
     private static PlantCollectionTable INSTANCE = null;
     public static String TABLE_NAME = "PlantCollection";
-    private PlantCollectionTable(SQLiteDatabase db) {
+    private PlantCollectionTable(SQLiteDatabase db, boolean tableExist) {
         database = db;
+        if (!tableExist){
+            createTable();
+        }
     }
-    public static void createInstance(SQLiteDatabase db){
+    public static void createInstance(SQLiteDatabase db,  boolean tableExist){
         if (INSTANCE == null){
-            INSTANCE = new PlantCollectionTable(db);
+            INSTANCE = new PlantCollectionTable(db, tableExist);
         }
     }
 
