@@ -2,6 +2,10 @@ package com.example.plantnetapp.back.tables;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.plantnetapp.back.entity.Entity;
+
+import java.util.List;
+
 public class PlantCollectionTable extends Table{
     private static PlantCollectionTable INSTANCE = null;
     public static String TABLE_NAME = "PlantCollection";
@@ -27,23 +31,24 @@ public class PlantCollectionTable extends Table{
     }
 
     @Override
-    public void dropTable() {
+    public void addData(Entity entity) {
 
     }
 
     @Override
-    public void addData() {
+    public void deleteData(Entity entity) {
 
     }
 
     @Override
-    public void deleteData() {
-
+    public Entity selectData(int id) throws Exception {
+        return null;
     }
 
     @Override
-    public void selectData() {
+    public List<Entity> selectAllData() {
 
+        return null;
     }
 
     @Override

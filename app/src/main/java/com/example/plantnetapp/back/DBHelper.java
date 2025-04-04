@@ -18,6 +18,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int BDD_VERSION = 1;
     private DBHelper(@Nullable Context context, @Nullable SQLiteDatabase.CursorFactory factory) {
         super(context, BDD_NAME, factory, BDD_VERSION);
+        this.getWritableDatabase();
     }
 
     public static DBHelper getInstance(@Nullable Context context, @Nullable SQLiteDatabase.CursorFactory factory){
@@ -33,12 +34,17 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void initializeTables(){
+        UserTable.createInstance(database, tableExist(UserTable.TABLE_NAME));
+        PlantTable.createInstance(database, tableExist(PlantTable.TABLE_NAME));
+        PlantCollectionTable.createInstance(database, tableExist(PlantCollectionTable.TABLE_NAME));
+    }
+
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        this.database = db;
-        UserTable.createInstance(db, tableExist(UserTable.TABLE_NAME));
-        PlantTable.createInstance(db, tableExist(PlantTable.TABLE_NAME));
-        PlantCollectionTable.createInstance(db, tableExist(PlantCollectionTable.TABLE_NAME));
+        database = db;
+        initializeTables();
     }
 
     @Override
@@ -46,15 +52,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    private boolean tableExist(String tableName){
-        String query = "SELECT name FROM sqlite_master WHERE type='table' AND name='?';";
-        try (Cursor cursor = database.rawQuery(
-                query,
-                new String[]{tableName}
-        )) {
+    public boolean tableExist(String tableName){
+        String query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?";
+        try (Cursor cursor = database.rawQuery(query, new String[]{tableName})) {
             return cursor.moveToFirst();
-        } catch (Exception e) {
-            throw e;
         }
     }
 }
