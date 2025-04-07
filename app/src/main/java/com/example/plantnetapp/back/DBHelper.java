@@ -13,12 +13,13 @@ import com.example.plantnetapp.back.tables.UserTable;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static DBHelper INSTANCE = null;
-    private SQLiteDatabase database = null;
+    private static SQLiteDatabase database = null;
     private static final String BDD_NAME = "PlantNet_BDD";
     private static final int BDD_VERSION = 1;
     private DBHelper(@Nullable Context context, @Nullable SQLiteDatabase.CursorFactory factory) {
         super(context, BDD_NAME, factory, BDD_VERSION);
         this.getWritableDatabase();
+        initializeTables();
     }
 
     public static DBHelper getInstance(@Nullable Context context, @Nullable SQLiteDatabase.CursorFactory factory){
@@ -28,8 +29,12 @@ public class DBHelper extends SQLiteOpenHelper {
         return INSTANCE;
     }
 
-    public void onClose() {
-        if (database != null){
+    public static void destroyInstance(){
+        INSTANCE = null;
+    }
+
+    public static void onClose() {
+        if (database != null && database.isOpen()){
             database.close();
         }
     }
@@ -44,7 +49,6 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         database = db;
-        initializeTables();
     }
 
     @Override

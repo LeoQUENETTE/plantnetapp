@@ -5,7 +5,7 @@ import com.example.plantnetapp.back.tables.UserTable;
 import java.util.Objects;
 
 public class User extends Entity{
-    public int id;
+    public int id = -1;
     public String login;
     public String mdp;
     public String firstName;
@@ -45,6 +45,9 @@ public class User extends Entity{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
+        if (user.id == -1 || this.id == -1){
+            return equalsWithoutId(user);
+        }
         return id == user.id && Objects.equals(login, user.login) && Objects.equals(mdp, user.mdp) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(role, user.role) && Objects.equals(mail, user.mail) && Objects.equals(phone, user.phone);
     }
 

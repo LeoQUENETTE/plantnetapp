@@ -24,6 +24,10 @@ public class UserTable extends Table{
         }
     }
 
+    public static void destroyInstance(){
+        INSTANCE = null;
+    }
+
     public static UserTable getInstance(){
         return INSTANCE;
     }
@@ -59,8 +63,15 @@ public class UserTable extends Table{
             throw new Exception("You can only use User type to delete data inside User table.");
         }
         User user = (User) entity;
-        String query = "DELETE FROM "+TABLE_NAME+" WHERE id=?";
-        Object[] bindArgs = {user.id};
+        String query;
+        Object[] bindArgs;
+        if (user.id == -1){
+            query = "DELETE FROM " + TABLE_NAME + " WHERE login=? AND mdp =? AND firstName=? AND lastName=? AND role=? AND mail=? AND phone=?";
+            bindArgs = new Object[]{user.login, user.mdp, user.firstName, user.lastName, user.role, user.mail, user.phone};
+        }else{
+            query = "DELETE FROM " + TABLE_NAME + " WHERE id=?";
+            bindArgs = new Object[]{user.id};
+        }
         database.execSQL(query, bindArgs);
     }
 
