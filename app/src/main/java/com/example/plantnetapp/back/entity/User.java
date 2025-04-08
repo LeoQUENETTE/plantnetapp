@@ -5,7 +5,6 @@ import com.example.plantnetapp.back.tables.UserTable;
 import java.util.Objects;
 
 public class User extends Entity{
-    public int id = -1;
     public String login;
     public String mdp;
     public String firstName;
