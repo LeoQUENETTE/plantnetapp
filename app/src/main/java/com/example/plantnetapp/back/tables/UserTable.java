@@ -46,6 +46,24 @@ public class UserTable extends Table{
         database.execSQL(query);
     }
 
+    public static User login(String login, String mdp) throws Exception {
+        String query = "SELECT * FROM "+TABLE_NAME+" WHERE login=? AND mdp=?";
+        String[] bindArgs = {login, mdp};
+        Cursor cursor = database.rawQuery(query, bindArgs);
+        if (!cursor.moveToFirst()){
+            throw new Exception("Empty Table "+TABLE_NAME);
+        }
+        int id = cursor.getInt(0);
+        String firstName = cursor.getString(3);
+        String lastName = cursor.getString(4);
+        String role = cursor.getString(5);
+        String mail = cursor.getString(6);
+        String phone = cursor.getString(7);
+        User user = new User(id, login, mdp, firstName, lastName, role, mail, phone);
+        cursor.close();
+        return user;
+    }
+
     @Override
     public void addData(Entity entity) throws Exception {
         if (entity.getClass() != User.class){
