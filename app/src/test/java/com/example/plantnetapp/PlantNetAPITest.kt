@@ -81,4 +81,57 @@ class PlantNetAPITest {
             Assert.fail(e.message);
         }
     }
+    @Test
+    fun apiGetSpeciesAllParameter(){
+        try{
+
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiGetSubscriptionTest(){
+        try{
+            val returnType : ReturnType = api.subscription()
+            assertEquals(200, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiGetDailyQuotaNoParameterTest(){
+        try{
+            val returnType : ReturnType = api.dailyQuota(null)
+            assertEquals(200, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiGetDailyQuotaTest(){
+        try{
+            val returnType : ReturnType = api.dailyQuota("14/04/2025")
+            assertEquals(200, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiGetHistoryQuotaNoParameterTest(){
+        try{
+            val returnType : ReturnType = api.historyQuota(0)
+            assertEquals(200, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiGetHistoryQuotaTest(){
+        try{
+            val returnType : ReturnType = api.historyQuota(2020)
+            assertEquals(200, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
 }
