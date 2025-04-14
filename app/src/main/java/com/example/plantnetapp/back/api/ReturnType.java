@@ -1,5 +1,7 @@
 package com.example.plantnetapp.back.api;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -45,11 +47,13 @@ public class ReturnType {
         return sb.toString();
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ReturnType{" +
                 "status=" + status +
                 ", type='" + type + '\'' +
+                this.parseJsonElement(values,0)+
                 '}';
     }
 }

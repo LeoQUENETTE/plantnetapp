@@ -1,6 +1,8 @@
 package com.example.plantnetapp.back.api;
 
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.Nullable;
 
 import com.google.gson.JsonElement;
@@ -13,14 +15,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 public class PlantNetAPI {
     private static PlantNetAPI INSTANCE = null;
     private final String URL_NAME = "https://my-api.plantnet.org/";
     private final String API_KEY = "2b10JCvsWMcjpFIjVGoD3HloO";
+    private final int NB_IDENTIFICATION_MAX = 500;
     private PlantNetAPI() {
         try{
-            checkStatus();
+            ReturnType apiStatus = checkStatus();
+            if (apiStatus.status != 200 || !apiStatus.values.get("status").toString().equals("ok")){
+                INSTANCE = null;
+            }
         }catch (IOException e){
             INSTANCE = null;
         }
@@ -30,6 +39,15 @@ public class PlantNetAPI {
             INSTANCE = new PlantNetAPI();
         }
         return INSTANCE;
+    }
+    public boolean isIdentificationPossible() throws IOException {
+        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentDate = new Date();
+        String todayDateGoodFormat = dateFormat.format(currentDate);
+        ReturnType response = dailyQuota(todayDateGoodFormat);
+        JsonObject count = response.values.get("count").getAsJsonObject();
+        int nbIdentificationMade = count.get("identify").getAsInt();
+        return (nbIdentificationMade - NB_IDENTIFICATION_MAX) != 0;
     }
     private ReturnType createRequest(Map<String, String> parameters, String urlServiceName) throws IOException {
         URL url = new URL(URL_NAME+urlServiceName);
@@ -61,11 +79,15 @@ public class PlantNetAPI {
         int status = con.getResponseCode();
         String type;
         String inputLine;
+        BufferedReader in;
         StringBuilder response = new StringBuilder();
         JsonElement jsonElement;
         JsonObject jsonObject = new JsonObject();
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        if (status == 200){
+            in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        }else{
+            in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+        }
 
         while ((inputLine = in.readLine()) != null){
             response.append(inputLine);
@@ -151,12 +173,18 @@ public class PlantNetAPI {
         if (projectName == null || projectName.trim().isEmpty()){
             throw new IOException("ERROR : No value passed for the project name");
         }
+        if (!isIdentificationPossible()){
+            throw new IOException("ERROR : No identification left");
+        }
         return createRequest(request);
     }
     public ReturnType identify(String projectName)throws IOException{
         String request = "v2/identify/"+projectName;
         if (projectName == null || projectName.trim().isEmpty()){
             throw new IOException("ERROR : No value passed for the project name");
+        }
+        if (!isIdentificationPossible()){
+            throw new IOException("ERROR : No identification left");
         }
         return createRequest(request);
     }
