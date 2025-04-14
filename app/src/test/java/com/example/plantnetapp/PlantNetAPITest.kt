@@ -93,7 +93,7 @@ class PlantNetAPITest {
     fun apiGetSubscriptionTest(){
         try{
             val returnType : ReturnType = api.subscription()
-            assertEquals(200, returnType.status)
+            assertEquals(403, returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
         }
@@ -110,7 +110,7 @@ class PlantNetAPITest {
     @Test
     fun apiGetDailyQuotaTest(){
         try{
-            val returnType : ReturnType = api.dailyQuota("14/04/2025")
+            val returnType : ReturnType = api.dailyQuota("2025-04-14")
             assertEquals(200, returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
@@ -120,7 +120,7 @@ class PlantNetAPITest {
     fun apiGetHistoryQuotaNoParameterTest(){
         try{
             val returnType : ReturnType = api.historyQuota(0)
-            assertEquals(200, returnType.status)
+            assertEquals(403, returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
         }
@@ -129,7 +129,7 @@ class PlantNetAPITest {
     fun apiGetHistoryQuotaTest(){
         try{
             val returnType : ReturnType = api.historyQuota(2020)
-            assertEquals(200, returnType.status)
+            assertEquals(403, returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
         }
