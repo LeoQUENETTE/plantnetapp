@@ -25,7 +25,7 @@ public class PlantNetAPI {
             INSTANCE = null;
         }
     }
-    public static PlantNetAPI createInstance() throws IOException {
+    public static PlantNetAPI createInstance() {
         if (INSTANCE == null){
             INSTANCE = new PlantNetAPI();
         }
@@ -62,7 +62,7 @@ public class PlantNetAPI {
         String type;
         String inputLine;
         StringBuilder response = new StringBuilder();
-        JsonElement jsonElement = null;
+        JsonElement jsonElement;
         JsonObject jsonObject = new JsonObject();
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
