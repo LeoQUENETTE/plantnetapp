@@ -3,7 +3,7 @@ package com.example.plantnetapp.back.entity;
 import java.util.Objects;
 
 public class Plant  extends Entity{
-    public String name;
+    public final String name;
     public float azoteFixing = 0;
     public float upgradeGrnd = 0;
     public float waterFixing = 0;

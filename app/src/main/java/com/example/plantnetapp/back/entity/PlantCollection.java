@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class PlantCollection extends Entity{
     public List<Plant> plantList = null;
-    public int nbPlant = 0;
+    public final int nbPlant = 0;
 
     public PlantCollection(int id, List<Plant> plantList){
         this.id = id;

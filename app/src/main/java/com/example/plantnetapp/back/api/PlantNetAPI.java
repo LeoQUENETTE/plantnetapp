@@ -2,6 +2,7 @@ package com.example.plantnetapp.back.api;
 
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 
 import androidx.annotation.Nullable;
 
@@ -10,15 +11,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+
 public class PlantNetAPI {
     private static PlantNetAPI INSTANCE = null;
     private final String URL_NAME = "https://my-api.plantnet.org/";
@@ -47,24 +53,42 @@ public class PlantNetAPI {
         ReturnType response = dailyQuota(todayDateGoodFormat);
         JsonObject count = response.values.get("count").getAsJsonObject();
         int nbIdentificationMade = count.get("identify").getAsInt();
-        return (nbIdentificationMade - NB_IDENTIFICATION_MAX) != 0;
+        return nbIdentificationMade < NB_IDENTIFICATION_MAX;
     }
-    private ReturnType createRequest(Map<String, String> parameters, String urlServiceName) throws IOException {
-        URL url = new URL(URL_NAME+urlServiceName);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setConnectTimeout(5000);
-        con.setReadTimeout(5000);
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setDoOutput(true);
-        DataOutputStream out = new DataOutputStream(con.getOutputStream());
-        out.writeBytes(ParameterStringBuilder.getParamsString(parameters));
-        out.flush();
-        out.close();
-        ReturnType requestResult = getRequestResult(con, "POST");
-        con.disconnect();
-        return requestResult;
+    public ReturnType createRequestPost(String urlStr, Map<String, Object> params) throws Exception {
+        // Prepare the parameter string in "key=value&key2=value2" format
+        StringBuilder postData = new StringBuilder();
+        String boundary = "----Boundary" + System.currentTimeMillis();
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        for (Map.Entry<String,Object> param : params.entrySet()) {
+            if (postData.length() != 0) postData.append('&');
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                postData.append(URLEncoder.encode(param.getKey(), StandardCharsets.UTF_8));
+                postData.append('=');
+                postData.append(URLEncoder.encode(param.getValue().toString(), StandardCharsets.UTF_8));
+            }
+        }
+        byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
+        // Create and configure the HTTP connection
+        URL url = new URL(URL_NAME + urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setDoOutput(true); // Allows sending body data
+        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+
+        // Send the request body
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(postDataBytes);
+        }
+
+        // For demonstration: read the response code
+        int responseCode = conn.getResponseCode();
+        System.out.println("Response Code: " + responseCode);
+        return getRequestResult(conn,"POST");
     }
-    private ReturnType createRequest(String urlServiceName) throws IOException {
+    private ReturnType createRequestGet(String urlServiceName) throws IOException {
         URL url = new URL(URL_NAME+urlServiceName);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -108,10 +132,10 @@ public class PlantNetAPI {
     }
 
     public ReturnType checkStatus() throws IOException {
-        return createRequest("v2/_status");
+        return createRequestGet("v2/_status");
     }
     public ReturnType languages() throws IOException {
-        return createRequest("v2/languages?api-key="+API_KEY);
+        return createRequestGet("v2/languages?api-key="+API_KEY);
     }
     public ReturnType projects(@Nullable String lang, @Nullable Float lat,@Nullable Float lon,@Nullable String type) throws Exception {
         String request = "v2/projects";
@@ -136,7 +160,7 @@ public class PlantNetAPI {
         }
         nbParameter += 1;
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,nbParameter == 1);
-        return createRequest(request);
+        return createRequestGet(request);
     }
     public ReturnType species(@Nullable String lang, @Nullable String type, int pageSize, @Nullable String prefix) throws Exception {
         String request = "v2/species";
@@ -161,32 +185,61 @@ public class PlantNetAPI {
         }
         nbParameter += 1;
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,nbParameter == 1);
-        return createRequest(request);
+        return createRequestGet(request);
     }
     public ReturnType subscription()throws IOException{
         String request = "v2/subscription";
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,true);
-        return createRequest(request);
+        return createRequestGet(request);
     }
-    public ReturnType identify(String projectName,String[] imagesUrl)throws IOException{
-        String request = "v2/identify/"+projectName;
+    public ReturnType identify(@Nullable String projectName,String[] imagesUrl)throws IOException{
         if (projectName == null || projectName.trim().isEmpty()){
-            throw new IOException("ERROR : No value passed for the project name");
+            projectName = "all";
         }
+        if (isIdentificationPossible()){
+            throw new IOException("ERROR : No identification left");
+        }
+        String request = "v2/identify/"+projectName;
+        return createRequestGet(request);
+    }
+    public ReturnType identify(File imageFile,
+            @Nullable String projectName, @Nullable Boolean includeRelatedImage,
+            @Nullable Boolean noReject, int nbResults,
+            @Nullable String lang, @Nullable String type, @Nullable String organs) throws Exception
+    {
         if (!isIdentificationPossible()){
             throw new IOException("ERROR : No identification left");
         }
-        return createRequest(request);
-    }
-    public ReturnType identify(String projectName)throws IOException{
-        String request = "v2/identify/"+projectName;
         if (projectName == null || projectName.trim().isEmpty()){
-            throw new IOException("ERROR : No value passed for the project name");
+            projectName = "all";
         }
-        if (!isIdentificationPossible()){
-            throw new IOException("ERROR : No identification left");
+        String request = "v2/identify/"+projectName;
+        if (includeRelatedImage == null){
+            includeRelatedImage =false;
         }
-        return createRequest(request);
+        request = ParameterStringBuilder.addGetParameter(request, "include-related-images", includeRelatedImage.toString(), true);
+        if (noReject==null){
+            noReject = false;
+        }
+        request = ParameterStringBuilder.addGetParameter(request, "no-reject", noReject.toString(), false);
+        if (nbResults > 0){
+            request = ParameterStringBuilder.addGetParameter(request, "nb-results", noReject.toString(), false);
+        }
+        if (lang != null && !lang.trim().isEmpty()){
+            request = ParameterStringBuilder.addGetParameter(request, "lang", lang, false);
+        }
+        if (type != null && (!type.equals("kt") && !type.equals("legacy"))){
+            throw new IOException("ERROR : The type can only be kt legacy or null");
+        }else if (type != null){
+            request = ParameterStringBuilder.addGetParameter(request, "type", type, false);
+        }
+        Map<String,Object> parameters = new HashMap<>();
+        parameters.put("images",imageFile);
+        if(organs != null && !organs.trim().isEmpty()){
+            parameters.put("organs",organs);
+        }
+        request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,false);
+        return createRequestPost(request,parameters);
     }
     public ReturnType dailyQuota(@Nullable String day)throws IOException{
         String request = "v2/quota/daily";
@@ -197,7 +250,7 @@ public class PlantNetAPI {
         }
         nbParameter += 1;
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,nbParameter == 1);
-        return createRequest(request);
+        return createRequestGet(request);
     }
     public ReturnType historyQuota(int year)throws IOException{
         String request = "v2/quota/history";
@@ -208,13 +261,13 @@ public class PlantNetAPI {
         }
         nbParameter += 1;
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,nbParameter == 1);
-        return createRequest(request);
+        return createRequestGet(request);
     }
     public ReturnType speciesByProject(String projectName)throws IOException{
         String request = "v2/projects/"+projectName+"/species";
         if (projectName == null || projectName.trim().isEmpty()){
             throw new IOException("ERROR : No value passed for the project name");
         }
-        return createRequest(request);
+        return createRequestGet(request);
     }
 }

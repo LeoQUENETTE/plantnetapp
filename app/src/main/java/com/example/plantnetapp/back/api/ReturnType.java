@@ -7,9 +7,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class ReturnType {
-    public int status;
-    public String type;
-    public JsonObject values;
+    public final int status;
+    public final String type;
+    public final JsonObject values;
 
     public ReturnType(int status, String type, JsonObject values) {
         this.status = status;

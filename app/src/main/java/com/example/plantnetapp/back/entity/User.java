@@ -5,13 +5,13 @@ import com.example.plantnetapp.back.tables.UserTable;
 import java.util.Objects;
 
 public class User extends Entity{
-    public String login;
-    public String mdp;
-    public String firstName;
-    public String lastName;
-    public String role;
-    public String mail;
-    public String phone;
+    public final String login;
+    public final String mdp;
+    public final String firstName;
+    public final String lastName;
+    public final String role;
+    public final String mail;
+    public final String phone;
 
     public User(int id, String login, String mdp, String firstName, String lastName, String role, String mail, String phone) {
         this.id = id;
