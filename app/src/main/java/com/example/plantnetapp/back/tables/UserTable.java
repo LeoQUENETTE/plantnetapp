@@ -11,7 +11,7 @@ import java.util.List;
 
 public class UserTable extends Table{
     private static UserTable INSTANCE = null;
-    public static String TABLE_NAME = "User";
+    public static final String TABLE_NAME = "User";
     private UserTable(SQLiteDatabase db,  boolean tableExist) {
         database = db;
         if (!tableExist){

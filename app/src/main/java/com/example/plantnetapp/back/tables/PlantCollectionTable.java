@@ -8,7 +8,7 @@ import java.util.List;
 
 public class PlantCollectionTable extends Table{
     private static PlantCollectionTable INSTANCE = null;
-    public static String TABLE_NAME = "PlantCollection";
+    public static final String TABLE_NAME = "PlantCollection";
     private PlantCollectionTable(SQLiteDatabase db, boolean tableExist) {
         database = db;
         if (!tableExist){

@@ -5,9 +5,10 @@ import com.example.plantnetapp.back.api.ReturnType
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 
 class PlantNetAPITest {
-    private val api : PlantNetAPI = PlantNetAPI.createInstance();
+    private val api : PlantNetAPI = PlantNetAPI.createInstance()
     @Test
     fun apiConnectionTest() {
         try{
@@ -15,7 +16,7 @@ class PlantNetAPITest {
             assertEquals(200,returnType.status)
             assertEquals("\"ok\"",returnType.values.get("status").toString())
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -24,7 +25,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.languages()
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -33,7 +34,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects("fr", 20F, 20F,"kt")
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -42,7 +43,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects("fr",null,null,null)
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -51,7 +52,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects(null,20F,null,null)
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -60,7 +61,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects(null,null,20F,null)
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -69,7 +70,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects(null,null,null,"kt")
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -78,7 +79,7 @@ class PlantNetAPITest {
             val returnType : ReturnType = api.projects(null,null,null,null)
             assertEquals(200,returnType.status)
         }catch (e : Exception){
-            Assert.fail(e.message);
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -130,6 +131,17 @@ class PlantNetAPITest {
         try{
             val returnType : ReturnType = api.historyQuota(2020)
             assertEquals(403, returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun apiIdentifyPostNoProjectTest(){
+        try {
+            val imageFile = File("testImages/rose-rouge.jpeg");
+            val returnType : ReturnType = api.identify(imageFile,null, null, null, 0, null, null, null)
+            println(returnType)
+            assertEquals(200, returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
         }
