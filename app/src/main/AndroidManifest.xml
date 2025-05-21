@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permission pour l'appareil photo -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,14 +17,40 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Plantnetapp"
-        tools:targetApi="31" >
-        <activity android:name=".front.MainActivity"
+        tools:targetApi="31">
+        <!-- Écran de connexion (Launcher) -->
+        <activity
+            android:name=".front.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
+        <!-- Écran d'inscription -->
+        <activity
+            android:name=".front.RegisterActivity"
+            android:exported="false" />
+        <!-- Écran principal -->
+        <activity
+            android:name=".front.MainActivity"
+            android:exported="false" />
+        <!-- Écran photo -->
+        <activity
+            android:name=".front.PhotoActivity"
+            android:exported="false" />
+        <!-- Écran historique -->
+        <activity
+            android:name=".front.HistoriqueActivity"
+            android:exported="false" />
+        <!-- Écran liste -->
+        <activity
+            android:name=".front.PlantsListActivity"
+            android:exported="false" />
+        <!-- Écran détail/descriptif -->
+        <activity
+            android:name=".front.DetailActivity"
+            android:exported="false" />
 
+    </application>
 </manifest>

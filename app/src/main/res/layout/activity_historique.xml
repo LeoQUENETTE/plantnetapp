@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Historique des analyses"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Pour la maquette, utilise un simple LinearLayout pour afficher une liste d'items statiques -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Analyse 1 : Plante X, le 01/04/2025" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Analyse 2 : Plante Y, le 30/03/2025"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>

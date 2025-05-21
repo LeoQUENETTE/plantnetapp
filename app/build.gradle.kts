@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+// Définition de la version CameraX
+val cameraxVersion = "1.2.0"
+
 android {
     namespace = "com.example.plantnetapp"
     compileSdk = 35
@@ -36,11 +39,25 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.monitor)
+    testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.core.v150)
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.junit.v115)
+    androidTestImplementation(libs.androidx.rules)
+
+    // Dépendances CameraX
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:1.2.0")
 }

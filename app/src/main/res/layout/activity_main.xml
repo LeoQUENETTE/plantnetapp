@@ -1,0 +1,46 @@
+<!-- activity_main.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image de fond -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_main"
+        android:scaleType="centerCrop"/>
+
+    <!-- Bouton invisible pour "Prendre une photo" -->
+    <Button
+        android:id="@+id/btnPhoto"
+        android:layout_width="340dp"
+        android:layout_height="230dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+        android:background="@android:color/transparent"
+        android:text=""
+        android:contentDescription="Prendre une photo"/>
+
+    <!-- Bouton invisible pour "Historique" -->
+    <Button
+        android:id="@+id/btnHistorique"
+        android:layout_width="290dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="390dp"
+        android:background="@android:color/transparent"
+        android:text=""
+        android:contentDescription="Historique"/>
+
+    <!-- Bouton invisible pour "List" -->
+    <Button
+        android:id="@+id/btnInfos"
+        android:layout_width="290dp"
+        android:layout_height="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="535dp"
+        android:background="@android:color/transparent"
+        android:text=""
+        android:contentDescription="List"/>
+
+</RelativeLayout>
