@@ -1,22 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="8dp"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    card:cardCornerRadius="8dp"
+    card:cardBackgroundColor="@color/light_gray_trans"
+    card:strokeColor="@android:color/transparent"
+    card:strokeWidth="0dp">
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:padding="8dp">
+
+<ImageView
+    android:id="@+id/ivPlante"
+    android:layout_width="64dp"
+    android:layout_height="64dp"
+    android:scaleType="centerCrop"/>
+
+<LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:paddingStart="8dp">
 
     <TextView
-        android:id="@+id/tvPlantName"
+        android:id="@+id/tvNomPlante"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nom de la plante"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
 
     <TextView
-        android:id="@+id/tvPlantDescription"
+        android:id="@+id/tvDescPlante"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Description de la plante"
-        android:textSize="14sp"/>
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="@color/black"/>
 </LinearLayout>
+</LinearLayout>
+    </com.google.android.material.card.MaterialCardView>

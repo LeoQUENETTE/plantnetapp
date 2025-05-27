@@ -13,34 +13,37 @@
     <!-- Bouton invisible pour "Prendre une photo" -->
     <Button
         android:id="@+id/btnPhoto"
-        android:layout_width="340dp"
-        android:layout_height="230dp"
+        android:layout_width="500dp"
+        android:layout_height="300dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="110dp"
-        android:background="@android:color/transparent"
+        android:layout_marginTop="130dp"
         android:text=""
+        android:background="@android:color/transparent"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Prendre une photo"/>
 
     <!-- Bouton invisible pour "Historique" -->
     <Button
         android:id="@+id/btnHistorique"
-        android:layout_width="290dp"
-        android:layout_height="120dp"
+        android:layout_width="360dp"
+        android:layout_height="150dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="390dp"
-        android:background="@android:color/transparent"
+        android:layout_marginTop="490dp"
         android:text=""
+        android:background="@android:color/transparent"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Historique"/>
 
     <!-- Bouton invisible pour "List" -->
     <Button
         android:id="@+id/btnInfos"
-        android:layout_width="290dp"
-        android:layout_height="120dp"
+        android:layout_width="360dp"
+        android:layout_height="150dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="535dp"
-        android:background="@android:color/transparent"
+        android:layout_marginTop="665dp"
         android:text=""
+        android:background="@android:color/transparent"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="List"/>
 
 </RelativeLayout>
