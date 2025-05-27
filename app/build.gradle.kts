@@ -1,23 +1,30 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
-
-// Définition de la version CameraX
-val cameraxVersion = "1.2.0"
 
 android {
     namespace = "com.example.plantnetapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.plantnetapp"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-
+        applicationId           = "com.example.plantnetapp"
+        minSdk                  = 24
+        targetSdk               = 35
+        versionCode             = 1
+        versionName             = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        // → Aligner Java sur 1.8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        // → Émettre du bytecode Java 1.8
+        jvmTarget = "1.8"
     }
 
     buildTypes {
@@ -29,33 +36,23 @@ android {
             )
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    // Core & UI
+    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
 
-    testImplementation(libs.junit)
-    testImplementation(libs.androidx.monitor)
-    testImplementation(libs.androidx.core)
-    testImplementation(libs.androidx.junit)
+    // Unit tests
+    testImplementation("junit:junit:4.13.2")
 
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.core.v150)
-    androidTestImplementation(libs.androidx.runner)
-    androidTestImplementation(libs.androidx.junit.v115)
-    androidTestImplementation(libs.androidx.rules)
+    // Instrumented tests
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    // Dépendances CameraX
+    // CameraX
+    val cameraxVersion = "1.2.0"
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")

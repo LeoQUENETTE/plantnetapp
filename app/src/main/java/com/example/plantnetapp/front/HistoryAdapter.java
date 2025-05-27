@@ -19,12 +19,19 @@ public class HistoryAdapter
         extends RecyclerView.Adapter<HistoryAdapter.VH>
         implements Filterable {
 
+    public interface OnHistoryClickListener {
+        void onItemClick(HistoryEntry entry);
+    }
+
     private final List<HistoryEntry> fullList;
     private List<HistoryEntry> filteredList;
+    private final OnHistoryClickListener listener;
 
-    public HistoryAdapter(List<HistoryEntry> list) {
+    // ← On ajoute bien le listener ici
+    public HistoryAdapter(List<HistoryEntry> list, OnHistoryClickListener listener) {
         this.fullList     = new ArrayList<>(list);
-        this.filteredList = list;
+        this.filteredList = new ArrayList<>(list);
+        this.listener     = listener;
     }
 
     @NonNull @Override
@@ -37,8 +44,9 @@ public class HistoryAdapter
     @Override
     public void onBindViewHolder(@NonNull VH holder, int pos) {
         HistoryEntry e = filteredList.get(pos);
-        holder.tvName .setText(e.getName());
-        holder.tvDate .setText(e.getDate());
+        holder.tvName.setText(e.getName());
+        holder.tvDate.setText(e.getDate());
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(e));
     }
 
     @Override
@@ -62,7 +70,7 @@ public class HistoryAdapter
                 String query = constraint == null ? "" : constraint.toString().toLowerCase().trim();
                 List<HistoryEntry> result = new ArrayList<>();
                 if (query.isEmpty()) {
-                    result = fullList;
+                    result.addAll(fullList);
                 } else {
                     for (HistoryEntry e : fullList) {
                         if (e.getName().toLowerCase().contains(query)
@@ -76,6 +84,7 @@ public class HistoryAdapter
                 return fr;
             }
             @Override protected void publishResults(CharSequence constraint, FilterResults results) {
+                //noinspection unchecked
                 filteredList = (List<HistoryEntry>) results.values;
                 notifyDataSetChanged();
             }
