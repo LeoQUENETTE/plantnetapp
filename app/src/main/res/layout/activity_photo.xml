@@ -1,0 +1,24 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".front.PhotoActivity">
+
+    <!-- PreviewView de CameraX pour afficher le flux caméra -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Bouton de capture superposé -->
+    <Button
+        android:id="@+id/btnCapture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prendre"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="24dp"
+        android:backgroundTint="#80000000"
+        android:textColor="#FFFFFF"/>
+</FrameLayout>
