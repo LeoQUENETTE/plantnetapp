@@ -3,16 +3,20 @@ package com.example.plantnetapp
 import com.example.plantnetapp.back.api.ExternalBDDApi
 import com.example.plantnetapp.back.api.PlantNetAPI
 import com.example.plantnetapp.back.api.ReturnType
+import com.example.plantnetapp.back.entity.Plant
 import com.example.plantnetapp.back.entity.PlantCollection
 import com.example.plantnetapp.back.entity.User
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
+import java.io.IOException
 
 class ExternalBDDApiTest {
-    private val api : ExternalBDDApi = ExternalBDDApi.createInstance()
+    private val     api : ExternalBDDApi = ExternalBDDApi.createInstance()
     private val testUser : User = User("TestUser","2ee9edd7b02f41082bc33f0276bdedf1", "firstname","lastname","email", "phone")
     private val testCollection : PlantCollection = PlantCollection("testCollection",arrayListOf())
+    private val testPlant : Plant = Plant("rose", 0.5F, 0.75F, 0.6F)
     @Test
     fun apiConnectionTest() {
         try{
@@ -25,7 +29,7 @@ class ExternalBDDApiTest {
     @Test
     fun getUser(){
         try{
-            val returnType : ReturnType = api.login("Polpate","test")
+            val returnType : ReturnType = api.login(testUser.login,testUser.mdp)
             assertEquals(200,returnType.status)
             assertEquals("TestUser", returnType.values.getAsJsonObject("User").get("username").asString)
             assertEquals("email", returnType.values.getAsJsonObject("User").get("email").asString)
@@ -54,6 +58,8 @@ class ExternalBDDApiTest {
             assertEquals(200,returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
+        }finally {
+            addUser()
         }
     }
 
@@ -73,7 +79,17 @@ class ExternalBDDApiTest {
     }
     @Test
     fun getAllPlantCollections(){
-
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val returnType : ReturnType = api.getAllPlantCollections(userID)
+            assertEquals(200,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
     }
 
     @Test
@@ -84,8 +100,8 @@ class ExternalBDDApiTest {
                 Assert.fail("Error getting user : "+getUserResponse.values)
             }
             val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
-            val returnType : ReturnType = api.getPlantCollection(userID,testCollection.name)
-            assertEquals(200,returnType.status)
+            val returnType : ReturnType = api.addPlantCollection(userID,testCollection.name)
+            assertEquals(201,returnType.status)
         }catch (e : Exception){
             Assert.fail(e.message)
         }
@@ -93,10 +109,107 @@ class ExternalBDDApiTest {
 
     @Test
     fun deletePlantCollection(){
-
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val returnType : ReturnType = api.deletePlantCollection(userID,testCollection.name)
+            assertEquals(200,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }finally {
+            try {
+                addPlantCollection()
+            }catch (e : Exception){
+                Assert.fail(e.message)
+            }
+        }
     }
     @Test
-    fun deletePlantCollections(){
+    fun addPlant(){
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            if (getCollectionResponse.status != 200){
+                Assert.fail("Error getting collection : "+getUserResponse.values)
+            }
+            val currentDirectory = System.getProperty("user.dir") + "/src/test/java/com/example/plantnetapp/"
+            val collectionID = getCollectionResponse.values.getAsJsonObject("PlantCollection").get("id").asString
+            val returnType : ReturnType = api.addPlant(collectionID, testPlant, File(currentDirectory+"testImages/rose-rouge.jpeg"))
+            assertEquals(201,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun getPlant(){
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            if (getCollectionResponse.status != 200){
+                Assert.fail("Error getting collection : "+getUserResponse.values)
+            }
+            val collectionID = getCollectionResponse.values.getAsJsonObject("PlantCollection").get("id").asString
+            val returnType : ReturnType = api.getPlant(collectionID, testPlant.name)
+            assertEquals(200,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun getAllPlants(){
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            if (getCollectionResponse.status != 200){
+                Assert.fail("Error getting collection : "+getUserResponse.values)
+            }
+            val collectionID = getCollectionResponse.values.getAsJsonObject("PlantCollection").get("id").asString
+            val returnType : ReturnType = api.getAllPlants(collectionID)
+            assertEquals(200,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun deletePlant(){
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            if (getCollectionResponse.status != 200){
+                Assert.fail("Error getting collection : "+getUserResponse.values)
+            }
+            val collectionID = getCollectionResponse.values.getAsJsonObject("PlantCollection").get("id").asString
+            try {
+                val returnType : ReturnType = api.deletePlant(collectionID, testPlant.name)
+                assertEquals(200,returnType.status)
+            }catch (e : IOException){
+                Assert.fail(e.message)
+            }finally {
+                val currentDirectory = System.getProperty("user.dir") + "/src/test/java/com/example/plantnetapp/"
+                api.addPlant(collectionID, testPlant, File(currentDirectory+"testImages/rose-rouge.jpeg"))
+            }
+        }catch (e : IOException){
+            Assert.fail(e.message)
+        }
 
     }
 }
