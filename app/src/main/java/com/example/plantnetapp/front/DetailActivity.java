@@ -1,6 +1,7 @@
 package com.example.plantnetapp.front;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -22,22 +23,32 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // on cache l'ActionBar
+        // Cacher l'ActionBar
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_detail);
 
+        // Récupérer la plante (via Serializable ou via String extras)
+        Plant plant = (Plant) getIntent().getSerializableExtra("plant");
+        String species = plant != null ? plant.getName() :
+                getIntent().getStringExtra("plantName");
+
         // 1) Bouton Retour
         Button btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Simplement fermer cette activité pour revenir à la précédente (MainActivity)
-                finish();
-            }
+        btnBack.setOnClickListener(v -> finish());
+
+        // 2) Bouton Web
+        Button btnWeb = findViewById(R.id.btnWeb);
+        btnWeb.setOnClickListener(v -> {
+            // Transformer "Carex sempervirens" → "Carex+sempervirens"
+            String query = species.trim().replace(" ", "+");
+            String url = "https://www.tela-botanica.org/?s=" + query;
+            // Ouvrir le navigateur
+            Intent web = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(web);
         });
 
         // 2) Récupérer et afficher le Plant (ou ses données passées)
-        Plant plant = (Plant) getIntent().getSerializableExtra("plant");
+        Plant plants = (Plant) getIntent().getSerializableExtra("plant");
         if (plant == null) {
             // Si vous passiez "plantName" et "plantDesc" à la place, adaptez ici :
             String name = getIntent().getStringExtra("plantName");

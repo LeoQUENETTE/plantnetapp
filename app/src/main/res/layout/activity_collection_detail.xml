@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Fond (optionnel) -->
+    <ImageView
+        android:id="@+id/ivCollectionBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_info"
+        android:scaleType="centerCrop"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:background="@android:color/transparent">
+
+        <!-- 1) Bouton retour + titre -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageButton
+                android:id="@+id/btnBackCollection"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                android:contentDescription="Retour"
+                android:background="?attr/selectableItemBackgroundBorderless"/>
+
+            <TextView
+                android:id="@+id/tvCollectionDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nom de la collection"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <!-- 2) Barre de recherche -->
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/svCollection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rechercher une plante…"
+            android:queryHint="Rechercher une plante…"
+            android:iconifiedByDefault="false"
+            android:background="#80000000"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 3) Liste des plantes (remplit tout l’espace restant) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPlantsInCollection"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="true"/>
+    </LinearLayout>
+</FrameLayout>
