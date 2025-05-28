@@ -49,7 +49,7 @@ public class UserTableTest {
 
     @Test
     public void addDataNoIDTest() throws Exception {
-        User user = new User("azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         assertEquals(1, Table.getTotalNbRows(UserTable.TABLE_NAME));
         User newUser = (User) userTable.selectData(1);
@@ -57,7 +57,7 @@ public class UserTableTest {
     }
     @Test
     public void addDataTest() throws Exception {
-        User user = new User(1,"azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User(1,"azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         assertEquals(1, Table.getTotalNbRows(UserTable.TABLE_NAME));
         User newUser = (User) userTable.selectData(1);
@@ -66,7 +66,7 @@ public class UserTableTest {
 
     @Test
     public void deleteDataNoIdTest() throws Exception {
-        User user = new User("azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         userTable.deleteData(user);
         assertEquals(0, Table.getTotalNbRows(UserTable.TABLE_NAME));
@@ -74,7 +74,7 @@ public class UserTableTest {
 
     @Test
     public void deleteDataWithIDTest() throws Exception {
-        User user = new User(1,"azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User(1,"azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         userTable.deleteData(user);
         assertEquals(0, Table.getTotalNbRows(UserTable.TABLE_NAME));
@@ -82,7 +82,7 @@ public class UserTableTest {
 
     @Test
     public void selectAllDataIDTest() throws Exception {
-        User user = new User(1,"azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User(1,"azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         List<User> userList = new ArrayList<>();
         userList.add(user);
@@ -92,7 +92,7 @@ public class UserTableTest {
     }
     @Test
     public void selectAllDataNoIDTest() throws Exception {
-        User user = new User("azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         List<User> userList = new ArrayList<>();
         userList.add(user);
@@ -103,14 +103,14 @@ public class UserTableTest {
 
     @Test
     public void selectDataNoIDTest() throws Exception {
-        User user = new User("azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         Entity bddUser = userTable.selectData(1);
         assertEquals(user, bddUser);
     }
     @Test
     public void selectDataIDTest() throws Exception {
-        User user = new User(1,"azerty","123456","Léo","Quenette","Admin","leoettag@gmail.com","0766190489");
+        User user = new User(1,"azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         Entity bddUser = userTable.selectData(user.id);
         assertEquals(user, bddUser);

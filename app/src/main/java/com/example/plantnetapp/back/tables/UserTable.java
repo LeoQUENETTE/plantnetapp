@@ -59,7 +59,7 @@ public class UserTable extends Table{
         String role = cursor.getString(5);
         String mail = cursor.getString(6);
         String phone = cursor.getString(7);
-        User user = new User(id, login, mdp, firstName, lastName, role, mail, phone);
+        User user = new User(id, login, mdp, firstName, lastName, mail, phone);
         cursor.close();
         return user;
     }
@@ -71,7 +71,7 @@ public class UserTable extends Table{
         }
         User user = (User) entity;
         String query = "INSERT INTO "+TABLE_NAME+" (login, mdp, firstName,lastName,role, mail, phone) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        Object[] bindArgs = {user.login, user.mdp, user.firstName, user.lastName, user.role,user.mail, user.phone};
+        Object[] bindArgs = {user.login, user.mdp, user.firstName, user.lastName, "",user.mail, user.phone};
         database.execSQL(query, bindArgs);
     }
 
@@ -85,7 +85,7 @@ public class UserTable extends Table{
         Object[] bindArgs;
         if (user.id == -1){
             query = "DELETE FROM " + TABLE_NAME + " WHERE login=? AND mdp =? AND firstName=? AND lastName=? AND role=? AND mail=? AND phone=?";
-            bindArgs = new Object[]{user.login, user.mdp, user.firstName, user.lastName, user.role, user.mail, user.phone};
+            bindArgs = new Object[]{user.login, user.mdp, user.firstName, user.lastName, "", user.mail, user.phone};
         }else{
             query = "DELETE FROM " + TABLE_NAME + " WHERE id=?";
             bindArgs = new Object[]{user.id};
@@ -108,7 +108,7 @@ public class UserTable extends Table{
         String role = cursor.getString(5);
         String mail = cursor.getString(6);
         String phone = cursor.getString(7);
-        User user = new User(id, login, mdp, firstName, lastName, role, mail, phone);
+        User user = new User(id, login, mdp, firstName, lastName, mail, phone);
         cursor.close();
         return user;
     }
@@ -130,7 +130,7 @@ public class UserTable extends Table{
             String role = cursor.getString(5);
             String mail = cursor.getString(6);
             String phone = cursor.getString(7);
-            User user = new User(id, login, mdp, firstName, lastName, role, mail, phone);
+            User user = new User(id, login, mdp, firstName, lastName, mail, phone);
             userList.add(user);
             cursor.moveToNext();
         }

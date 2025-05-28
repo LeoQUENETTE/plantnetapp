@@ -7,12 +7,16 @@ public class PlantCollection extends Entity{
     public List<Plant> plantList = null;
     public final int nbPlant = 0;
 
-    public PlantCollection(int id, List<Plant> plantList){
+    public String name;
+
+    public PlantCollection(int id, String name, List<Plant> plantList){
         this.id = id;
         this.plantList = plantList;
+        this.name = name;
     }
-    public PlantCollection(List<Plant> plantList){
+    public PlantCollection(String name,List<Plant> plantList){
         this.plantList = plantList;
+        this.name = name;
     }
     @Override
     public boolean equalsWithoutId(Object o) {
