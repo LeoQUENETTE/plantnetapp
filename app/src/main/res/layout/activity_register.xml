@@ -1,0 +1,113 @@
+<!-- activity_register.xml -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Image de fond -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_register" />
+
+    <!-- ScrollView pour assurer la navigation verticale -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="60dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:elevation="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="                           "
+                android:textSize="24sp"
+                android:textColor="#000"
+                android:layout_marginBottom="30dp"/>
+
+            <!-- Champs comme précédemment -->
+            <EditText
+                android:id="@+id/etLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Login"
+                android:background="#FFFFFF"
+                android:padding="10dp"/>
+
+            <EditText
+                android:id="@+id/etFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Prénom"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <EditText
+                android:id="@+id/etLastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nom"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <EditText
+                android:id="@+id/etMdp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Mot de passe"
+                android:inputType="textPassword"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <EditText
+                android:id="@+id/etRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Rôle"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <EditText
+                android:id="@+id/etMail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Téléphone"
+                android:inputType="phone"
+                android:background="#FFFFFF"
+                android:padding="10dp"
+                android:layout_marginTop="25dp"/>
+
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="178dp"
+                android:layout_height="90dp"
+                android:layout_marginTop="110dp"
+                android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:text="                 "
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>
