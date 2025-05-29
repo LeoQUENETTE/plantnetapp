@@ -9,9 +9,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.api.ExternalBDDApi;
+import com.example.plantnetapp.back.entity.User;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RegisterActivity extends AppCompatActivity {
-    private EditText etLogin, etFirstName, etLastName, etMdp, etRole, etMail, etPhone;
+    private EditText etUsername, etFirstName, etLastName, etPswrd, etRole, etMail, etPhone;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -25,10 +31,10 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // 2) Liaison des champs
-        etLogin     = findViewById(R.id.etLogin);
+        etUsername = findViewById(R.id.etLogin);
         etFirstName = findViewById(R.id.etFirstName);
         etLastName  = findViewById(R.id.etLastName);
-        etMdp       = findViewById(R.id.etMdp);
+        etPswrd = findViewById(R.id.etMdp);
         etRole      = findViewById(R.id.etRole);
         etMail      = findViewById(R.id.etMail);
         etPhone     = findViewById(R.id.etPhone);
@@ -41,23 +47,22 @@ public class RegisterActivity extends AppCompatActivity {
                 if (validateInputs()) {
                     // Ici la logique d’inscription réelle
                     Toast.makeText(RegisterActivity.this, "Inscription réussie !", Toast.LENGTH_SHORT).show();
-
-                    // 4) Redirection vers l'écran de login
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    // On vide la pile pour éviter retour à Register
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+                    register(etUsername.getText().toString(),
+                            etPswrd.getText().toString(),
+                            etFirstName.getText().toString(),
+                            etLastName.getText().toString(),
+                            etMail.getText().toString(),
+                            etPhone.getText().toString());
                 }
             }
         });
     }
 
     private boolean validateInputs() {
-        if (TextUtils.isEmpty(etLogin.getText())   ||
+        if (TextUtils.isEmpty(etUsername.getText())   ||
                 TextUtils.isEmpty(etFirstName.getText())||
                 TextUtils.isEmpty(etLastName.getText()) ||
-                TextUtils.isEmpty(etMdp.getText())      ||
+                TextUtils.isEmpty(etPswrd.getText())      ||
                 TextUtils.isEmpty(etRole.getText())     ||
                 TextUtils.isEmpty(etMail.getText())     ||
                 TextUtils.isEmpty(etPhone.getText())) {
@@ -66,5 +71,24 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    private void register(String username,String  pswrd,String  firstname,String  lastname,String  mail,String phone){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            User newUser = new User(null, username, pswrd,firstname,lastname,mail, phone);
+            ExternalBDDApi api = ExternalBDDApi.createInstance();
+            try {
+                api.addUser(newUser);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            runOnUiThread(() -> {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            });
+        });
     }
 }

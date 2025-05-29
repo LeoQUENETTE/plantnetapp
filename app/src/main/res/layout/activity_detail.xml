@@ -4,14 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Fond (optionnel) -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/bg_info"
         android:scaleType="centerCrop" />
 
-    <!-- Contenu principal -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +21,6 @@
             android:layout_height="wrap_content">
 
 
-        <!-- En-tête : Retour à gauche, Web à droite -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,7 +28,6 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="16dp">
 
-            <!-- Bouton invisible “Retour” -->
             <Button
                 android:id="@+id/btnBack"
                 android:layout_width="150dp"
@@ -39,13 +35,11 @@
                 android:background="@android:color/transparent"
                 android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
-            <!-- Espace flexible -->
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
 
-            <!-- Bouton Web -->
             <Button
                 android:id="@+id/btnWeb"
                 android:layout_width="150dp"

@@ -1,8 +1,10 @@
 package com.example.plantnetapp.back.entity;
 
+import com.example.plantnetapp.back.api.ExternalBDDApi;
 import com.example.plantnetapp.back.api.ReturnType;
 import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class User extends Entity{
@@ -61,5 +63,18 @@ public class User extends Entity{
         String lastname = object.getAsJsonObject("User").get("lastname").getAsString();
         String phone = object.getAsJsonObject("User").get("phone").getAsString();
         return new User(id, username, firstname, lastname, email, phone);
+    }
+
+    public static User login(String username ,String pswrd){
+        ExternalBDDApi api = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = api.login(username, pswrd);
+            if (response.status != 200 || response.values == null){
+                return null;
+            }
+            return User.userFromJSON(response.values);
+        }catch (Exception e){
+            return null;
+        }
     }
 }

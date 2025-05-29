@@ -4,13 +4,14 @@
     android:layout_height="match_parent">
 
     <!-- Image de fond -->
+
+    <!-- Conteneur pour formulaire centré -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_login"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_login" />
 
-    <!-- Conteneur pour formulaire centré -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -65,7 +66,7 @@
             android:layout_height="60dp"
             android:layout_marginTop="45dp"
             android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:text="                    "
+            android:text=""
             android:background="@android:color/transparent"/>
     </LinearLayout>
 
