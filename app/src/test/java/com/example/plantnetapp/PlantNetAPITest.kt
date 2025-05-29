@@ -138,7 +138,8 @@ class PlantNetAPITest {
     @Test
     fun apiIdentifyPostNoProjectTest(){
         try {
-            val imageFile = File("testImages/rose-rouge.jpeg");
+            val currentDirectory = System.getProperty("user.dir") + "/src/test/java/com/example/plantnetapp/"
+            val imageFile = File(currentDirectory + "testImages/rose-rouge.jpeg");
             val returnType : ReturnType = api.identify(imageFile,null, null, null, 0, null, null, null)
             println(returnType)
             assertEquals(200, returnType.status)

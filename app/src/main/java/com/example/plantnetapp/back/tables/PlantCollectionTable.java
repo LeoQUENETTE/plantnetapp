@@ -41,7 +41,7 @@ public class PlantCollectionTable extends Table{
     }
 
     @Override
-    public Entity selectData(int id) throws Exception {
+    public Entity selectData(String id) throws Exception {
         return null;
     }
 

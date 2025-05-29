@@ -27,7 +27,7 @@ public abstract class Table {
     }
     public abstract void addData(Entity entity) throws Exception;
     public abstract void deleteData(Entity entity) throws Exception;
-    public abstract Entity selectData(int id) throws Exception;
+    public abstract Entity selectData(String id) throws Exception;
     public abstract List<Entity> selectAllData() throws Exception;
     public static int getTotalNbRows(String tableName) {
         String query = "SELECT * FROM "+tableName;

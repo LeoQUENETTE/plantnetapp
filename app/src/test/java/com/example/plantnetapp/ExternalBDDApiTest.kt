@@ -14,7 +14,7 @@ import java.io.IOException
 
 class ExternalBDDApiTest {
     private val     api : ExternalBDDApi = ExternalBDDApi.createInstance()
-    private val testUser : User = User("TestUser","2ee9edd7b02f41082bc33f0276bdedf1", "firstname","lastname","email", "phone")
+    private val testUser : User = User(null,"TestUser","2ee9edd7b02f41082bc33f0276bdedf1", "firstname","lastname","email", "phone")
     private val testCollection : PlantCollection = PlantCollection("testCollection",arrayListOf())
     private val testPlant : Plant = Plant("rose", 0.5F, 0.75F, 0.6F)
     @Test
@@ -211,5 +211,64 @@ class ExternalBDDApiTest {
             Assert.fail(e.message)
         }
 
+    }
+
+    @Test
+    fun userFromJSON(){
+        try {
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val user = User.userFromJSON(getUserResponse.values)
+            assertEquals(user.login, testUser.login)
+            assertEquals(user.mail, testUser.mail)
+            assertEquals(user.firstName, testUser.firstName)
+            assertEquals(user.lastName, testUser.lastName)
+            assertEquals(user.phone, testUser.phone)
+        }
+        catch (e : IOException){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun collectionFromJSON(){
+        try {
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            val collection = PlantCollection.plantCollectionFromJSON(getCollectionResponse.values)
+            assertEquals(collection.name , testCollection.name)
+        }
+        catch (e : IOException){
+            Assert.fail(e.message)
+        }
+    }
+    @Test
+    fun plantFromJSON(){
+        try {
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val getCollectionResponse = api.getPlantCollection(userID,testCollection.name)
+            if (getCollectionResponse.status != 200){
+                Assert.fail("Error getting collection : "+getCollectionResponse.values.asString)
+            }
+            val collectionID = getCollectionResponse.values.getAsJsonObject("PlantCollection").get("id").asString
+            val getPlantResponse = api.getPlant(collectionID, testPlant.name)
+            if (getPlantResponse.status != 200){
+                Assert.fail("Error getting plant : "+getPlantResponse.values.asString)
+            }
+            val plant = Plant.plantFromJSON(getPlantResponse.values)
+            assertEquals(plant.name , testPlant.name)
+        }
+        catch (e : IOException){
+            Assert.fail(e.message)
+        }
     }
 }

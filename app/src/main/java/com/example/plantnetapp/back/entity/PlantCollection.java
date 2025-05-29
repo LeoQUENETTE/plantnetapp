@@ -1,5 +1,7 @@
 package com.example.plantnetapp.back.entity;
 
+import com.google.gson.JsonObject;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +11,7 @@ public class PlantCollection extends Entity{
 
     public String name;
 
-    public PlantCollection(int id, String name, List<Plant> plantList){
+    public PlantCollection(String id, String name, List<Plant> plantList){
         this.id = id;
         this.plantList = plantList;
         this.name = name;
@@ -34,5 +36,11 @@ public class PlantCollection extends Entity{
     @Override
     public int hashCode() {
         return Objects.hash(plantList, nbPlant);
+    }
+
+    public static PlantCollection plantCollectionFromJSON(JsonObject object){
+        String id = object.getAsJsonObject("PlantCollection").get("id").getAsString();
+        String name = object.getAsJsonObject("PlantCollection").get("name").getAsString();
+        return new PlantCollection(id, name,null);
     }
 }

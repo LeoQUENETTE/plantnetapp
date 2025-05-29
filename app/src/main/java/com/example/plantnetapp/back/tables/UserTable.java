@@ -8,6 +8,7 @@ import com.example.plantnetapp.back.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserTable extends Table{
     private static UserTable INSTANCE = null;
@@ -53,7 +54,7 @@ public class UserTable extends Table{
         if (!cursor.moveToFirst()){
             throw new Exception("Empty Table "+TABLE_NAME);
         }
-        int id = cursor.getInt(0);
+        String id = cursor.getString(0);
         String firstName = cursor.getString(3);
         String lastName = cursor.getString(4);
         String role = cursor.getString(5);
@@ -83,7 +84,7 @@ public class UserTable extends Table{
         User user = (User) entity;
         String query;
         Object[] bindArgs;
-        if (user.id == -1){
+        if (Objects.equals(user.id, "")){
             query = "DELETE FROM " + TABLE_NAME + " WHERE login=? AND mdp =? AND firstName=? AND lastName=? AND role=? AND mail=? AND phone=?";
             bindArgs = new Object[]{user.login, user.mdp, user.firstName, user.lastName, "", user.mail, user.phone};
         }else{
@@ -94,7 +95,7 @@ public class UserTable extends Table{
     }
 
     @Override
-    public Entity selectData(int id) throws Exception{
+    public Entity selectData(String id) throws Exception{
         String query = "SELECT * FROM "+TABLE_NAME+" WHERE id=?";
         String[] bindArgs = {String.valueOf(id)};
         Cursor cursor = database.rawQuery(query, bindArgs);
@@ -122,7 +123,7 @@ public class UserTable extends Table{
             throw new Exception("Empty Table "+TABLE_NAME);
         }
         for (int i = 0; i < cursor.getCount(); i++){
-            int id = cursor.getInt(0);
+            String id = cursor.getString(0);
             String login = cursor.getString(1);
             String mdp = cursor.getString(2);
             String firstName = cursor.getString(3);

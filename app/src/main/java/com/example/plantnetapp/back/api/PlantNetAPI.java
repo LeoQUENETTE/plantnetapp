@@ -10,13 +10,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -55,38 +59,87 @@ public class PlantNetAPI {
         int nbIdentificationMade = count.get("identify").getAsInt();
         return nbIdentificationMade < NB_IDENTIFICATION_MAX;
     }
-    public ReturnType createRequestPost(String urlStr, Map<String, Object> params) throws Exception {
-        // Prepare the parameter string in "key=value&key2=value2" format
-        StringBuilder postData = new StringBuilder();
-        String boundary = "----Boundary" + System.currentTimeMillis();
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        for (Map.Entry<String,Object> param : params.entrySet()) {
-            if (postData.length() != 0) postData.append('&');
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                postData.append(URLEncoder.encode(param.getKey(), StandardCharsets.UTF_8));
-                postData.append('=');
-                postData.append(URLEncoder.encode(param.getValue().toString(), StandardCharsets.UTF_8));
+    public ReturnType sendPostRequest(String endpoint, JsonObject body, @Nullable File file) throws  IOException{
+        HttpURLConnection connection = null;
+        String boundary = "----WebKitFormBoundary" + System.currentTimeMillis();
+        try{
+            URL url = new URL(URL_NAME + endpoint);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Accept", "*/*");
+            if (file == null){
+                connection.setRequestProperty("Content-Type", "application/json; utf-8");
+            }else{
+                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+            }
+
+            connection.setDoOutput(true);
+
+            if (file == null){
+                try (OutputStream os = connection.getOutputStream()) {
+                    byte[] input = body.toString().getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            }
+            else{
+                linkImageToRequest(connection,boundary, body,file, "image");
+            }
+
+
+            int status = connection.getResponseCode();
+            String contentType = connection.getContentType();
+
+            JsonObject responseJson = null;
+            InputStream responseStream = connection.getResponseCode() >= 400
+                    ? connection.getErrorStream()
+                    : connection.getInputStream();
+            //Read response
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                if (!response.toString().isEmpty()) {
+                    responseJson = JsonParser.parseString(response.toString()).getAsJsonObject();
+                } else {
+                    responseJson = new JsonObject();
+                }
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+            return new ReturnType(status, contentType, responseJson != null ? responseJson : new JsonObject());
+        }
+        finally {
+            if (connection != null) {
+                connection.disconnect();
             }
         }
-        byte[] postDataBytes = postData.toString().getBytes(StandardCharsets.UTF_8);
-        // Create and configure the HTTP connection
-        URL url = new URL(URL_NAME + urlStr);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setDoOutput(true); // Allows sending body data
-        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+    }
+    public void linkImageToRequest(HttpURLConnection connection, String boundary, JsonObject body, File file, String fileFieldName) throws IOException {
+        try (OutputStream outputStream = connection.getOutputStream();
+             BufferedOutputStream bos = new BufferedOutputStream(outputStream);
+             FileInputStream fileInputStream = new FileInputStream(file)) {
 
-        // Send the request body
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(postDataBytes);
+            // Écriture de l'en-tête du fichier
+            String fileHeader = "--" + boundary + "\r\n" +
+                    "Content-Disposition: form-data; name=\"images\"; filename=\"" + file.getName() + "\"\r\n" +
+                    "Content-Type: " + URLConnection.guessContentTypeFromName(file.getName()) + "\r\n\r\n";
+            bos.write(fileHeader.getBytes(StandardCharsets.UTF_8));
+
+            // Écriture du contenu du fichier
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                bos.write(buffer, 0, bytesRead);
+            }
+            bos.write("\r\n".getBytes(StandardCharsets.UTF_8));
+
+            // Écriture de la fin
+            String end = "--" + boundary + "--\r\n";
+            bos.write(end.getBytes(StandardCharsets.UTF_8));
+            bos.flush();
         }
-
-        // For demonstration: read the response code
-        int responseCode = conn.getResponseCode();
-        System.out.println("Response Code: " + responseCode);
-        return getRequestResult(conn,"POST");
     }
     private ReturnType createRequestGet(String urlServiceName) throws IOException {
         URL url = new URL(URL_NAME+urlServiceName);
@@ -234,12 +287,12 @@ public class PlantNetAPI {
             request = ParameterStringBuilder.addGetParameter(request, "type", type, false);
         }
         Map<String,Object> parameters = new HashMap<>();
-        parameters.put("images",imageFile);
         if(organs != null && !organs.trim().isEmpty()){
             parameters.put("organs",organs);
         }
         request = ParameterStringBuilder.addGetParameter(request, "api-key",API_KEY,false);
-        return createRequestPost(request,parameters);
+        JsonObject body = new JsonObject();
+        return sendPostRequest(request,body, imageFile);
     }
     public ReturnType dailyQuota(@Nullable String day)throws IOException{
         String request = "v2/quota/daily";

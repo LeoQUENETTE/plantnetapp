@@ -46,7 +46,8 @@ dependencies {
     implementation(libs.gson)
 
     // Unit tests
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:4.5.1")
 
     // Instrumented tests
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
