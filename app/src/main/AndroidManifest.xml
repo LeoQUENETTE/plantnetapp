@@ -36,6 +36,7 @@
         <activity android:name=".front.DetailActivity"      android:exported="false"/>
         <activity android:name=".front.CollectionDetailActivity" android:exported="false"/>
         <activity android:name=".front.ResultActivity" android:exported="false"/>
+        <activity android:name=".front.PreviewActivity" android:exported="false"/>
 
 
     </application>

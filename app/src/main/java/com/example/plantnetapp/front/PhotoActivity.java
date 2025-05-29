@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
@@ -94,13 +96,20 @@ public class PhotoActivity extends AppCompatActivity {
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        // Ici tu peux rediriger vers ResultActivity en passant le chemin
-                        Intent intent = new Intent(PhotoActivity.this, ResultActivity.class);
-                        intent.putExtra("photo_path", photoFile.getAbsolutePath());
-                        startActivity(intent);
+                        runOnUiThread(() -> {
+                            // Start PreviewActivity with the image path
+                            Intent intent = new Intent(PhotoActivity.this, PreviewActivity.class);
+                            intent.putExtra("photo_path", photoFile.getAbsolutePath());
+                            startActivity(intent);
+                        });
                     }
+
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
+                        runOnUiThread(() ->
+                                Toast.makeText(PhotoActivity.this,
+                                        "Error saving photo: " + exception.getMessage(),
+                                        Toast.LENGTH_SHORT).show());
                         exception.printStackTrace();
                     }
                 }
