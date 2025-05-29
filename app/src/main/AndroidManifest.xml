@@ -34,6 +34,8 @@
         <activity android:name=".front.HistoriqueActivity"  android:exported="false"/>
         <activity android:name=".front.PlantsListActivity"  android:exported="false"/>
         <activity android:name=".front.DetailActivity"      android:exported="false"/>
+        <activity android:name=".front.CollectionDetailActivity" android:exported="false"/>
+
 
     </application>
 </manifest>

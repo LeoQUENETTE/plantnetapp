@@ -4,53 +4,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Image de fond -->
     <ImageView
-        android:id="@+id/ivBackground"
+        android:id="@+id/ivHistoryBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/bg_list"
         android:scaleType="centerCrop" />
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <!-- Bouton Retour -->
-    <Button
+    <!-- 1) Bouton Retour -->
+    <ImageButton
         android:id="@+id/btnBackHistory"
-        android:layout_width="150dp"
+        android:layout_width="160dp"
         android:layout_height="60dp"
-        android:background="@android:color/transparent"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:layout_marginBottom="8dp"/>
+        android:contentDescription="Retour"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
 
-    <!-- Barre de recherche plus sombre -->
-    <FrameLayout
-        android:id="@+id/searchContainerHistory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#80000000"
-        android:padding="8dp"
-        android:layout_marginBottom="12dp">
-
+    <!-- 2) Barre de recherche qui filtre BOTH -->
     <androidx.appcompat.widget.SearchView
-        android:id="@+id/svHistory"
+        android:id="@+id/svGlobal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Rechercher nom ou date…"
+        android:queryHint="Rechercher…"
+        android:text="Rechercher une plante…"
         android:iconifiedByDefault="false"
-        android:background="@android:color/transparent"
-        android:padding="4dp"/>
-</FrameLayout>
+        android:background="#80000000"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
 
-<androidx.recyclerview.widget.RecyclerView
-android:id="@+id/rvHistory"
-android:layout_width="match_parent"
-android:layout_height="0dp"
-android:layout_weight="1"
-android:nestedScrollingEnabled="false"/>
+    <!-- 3) Historique complet (4 items visibles puis scroll) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Historique complet"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:layout_marginBottom="4dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHistoryAll"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:overScrollMode="never"
+        android:nestedScrollingEnabled="true"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- 4) Mes collections (scroll independent) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mes collections"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:layout_marginBottom="4dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCollections"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:nestedScrollingEnabled="true"/>
+
     </LinearLayout>
-    </FrameLayout>
+</FrameLayout>
