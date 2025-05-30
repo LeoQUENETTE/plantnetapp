@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.PlantCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class CollectionAdapter
     @Override
     public void onBindViewHolder(@NonNull VH holder, int pos) {
         PlantCollection c = filteredList.get(pos);
-        holder.tvName.setText(c.getName());
+        holder.tvName.setText(c.name);
         holder.itemView.setOnClickListener(v -> listener.onClick(c));
     }
 
@@ -71,7 +72,7 @@ public class CollectionAdapter
                     result.addAll(fullList);
                 } else {
                     for (PlantCollection c : fullList) {
-                        if (c.getName().toLowerCase().contains(q)) {
+                        if (c.name.toLowerCase().contains(q)) {
                             result.add(c);
                         }
                     }

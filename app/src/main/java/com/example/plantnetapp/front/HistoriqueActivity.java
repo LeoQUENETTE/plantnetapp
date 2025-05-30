@@ -12,60 +12,58 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.PlantCollection;
+import com.example.plantnetapp.back.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HistoriqueActivity extends AppCompatActivity {
     private HistoryAdapter historyAdapter;
+    private static User connectedUser;
     private CollectionAdapter collectionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // on masque la barre système
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_historique);
+
+        User user = (User) getIntent().getSerializableExtra("connected_user");
+        if (user != null){
+            connectedUser = user;
+        }else{
+            finish();
+        }
 
         // 1) Retour
         ImageButton btnBack = findViewById(R.id.btnBackHistory);
         btnBack.setOnClickListener(v -> finish());
 
-        // 2) Mock historique
-        List<HistoryEntry> allHistory = new ArrayList<>();
-        allHistory.add(new HistoryEntry("Spergularia media", "01/04/2025"));
-        allHistory.add(new HistoryEntry("Carex sempervirens", "15/05/2025"));
-        allHistory.add(new HistoryEntry("Plante X", "30/03/2025"));
-        allHistory.add(new HistoryEntry("Plante Y", "28/02/2025"));
-        allHistory.add(new HistoryEntry("Plante Z", "20/01/2025"));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            PlantCollection history = PlantCollection.getHistory(connectedUser.id);
+            if (history != null){
+                List<Plant> historyPlants = Plant.getAllPlants(history.id);
+                runOnUiThread(() -> {
+                    createHistory(history,historyPlants);
+                });
 
-        RecyclerView rvAll = findViewById(R.id.rvHistoryAll);
-        rvAll.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        );
-        historyAdapter = new HistoryAdapter(allHistory, entry -> {
-            Intent i = new Intent(HistoriqueActivity.this, DetailActivity.class);
-            i.putExtra("plantName", entry.getName());
-            startActivity(i);
+            }
         });
-        rvAll.setAdapter(historyAdapter);
 
-        // 3) Mock collections
-        List<PlantCollection> collections = new ArrayList<>();
-        collections.add(new PlantCollection(1, "Roses"));
-        collections.add(new PlantCollection(2, "Fougères"));
-        collections.add(new PlantCollection(3, "Cactées"));
-        collections.add(new PlantCollection(4, "Succulentes"));
-
-        RecyclerView rvCols = findViewById(R.id.rvCollections);
-        rvCols.setLayoutManager(new LinearLayoutManager(this));
-        collectionAdapter = new CollectionAdapter(collections, col -> {
-            Intent i = new Intent(HistoriqueActivity.this, CollectionDetailActivity.class);
-            i.putExtra("collectionId", col.getId());
-            i.putExtra("collectionName", col.getName());
-            startActivity(i);
+        // 3) collections
+        executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            List<PlantCollection> collections = PlantCollection.getAllPlantCollection(connectedUser.id);
+            runOnUiThread(() -> {
+                createCollections(collections);
+            });
         });
-        rvCols.setAdapter(collectionAdapter);
+
 
         // 4) Barre de recherche unique
         SearchView sv = findViewById(R.id.svGlobal);
@@ -89,5 +87,33 @@ public class HistoriqueActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private void createHistory(PlantCollection history,List<Plant> historyPlants){
+        RecyclerView rvAll = findViewById(R.id.rvHistoryAll);
+        rvAll.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        );
+        historyAdapter = new HistoryAdapter(historyPlants, entry -> {
+            Intent i = new Intent(HistoriqueActivity.this, DetailActivity.class);
+            i.putExtra("plantName", entry.name);
+            i.putExtra("collection", history);
+            i.putExtra("user",connectedUser);
+            startActivity(i);
+        });
+        rvAll.setAdapter(historyAdapter);
+    }
+    private void createCollections(List<PlantCollection> collections){
+        RecyclerView rvCols = findViewById(R.id.rvCollections);
+        rvCols.setLayoutManager(new LinearLayoutManager(this));
+        if (collections != null && !collections.isEmpty()){
+            collectionAdapter = new CollectionAdapter(collections, col -> {
+                Intent i = new Intent(HistoriqueActivity.this, CollectionDetailActivity.class);
+                i.putExtra("collectionId", col.id);
+                i.putExtra("collectionName", col.name);
+                startActivity(i);
+            });
+        }
+        rvCols.setAdapter(collectionAdapter);
     }
 }

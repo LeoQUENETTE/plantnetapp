@@ -378,6 +378,44 @@ public class ExternalBDDApi {
         System.out.println(response);
         return response;
     }
+    private void addNumberWithoutDecimal(JsonObject obj, String key, float value) {
+        if (value == (int) value) {
+            int intValue = (int) value;
+            obj.addProperty(key, intValue); // ajoute un entier si c’est "0.0"
+        } else {
+            obj.addProperty(key, value); // sinon float classique
+        }
+    }
+    public ReturnType addPlantWithoutCollection(String userID, Plant plant,  File imageFile) throws IOException{
+        JsonObject body = new JsonObject();
+        String collectionID;
+        ReturnType colResponse;
+        try {
+            colResponse = getPlantCollection(userID,"history");
+        }catch (Exception e){
+            addPlantCollection(userID, "history");
+            colResponse = getPlantCollection(userID,"history");
+        }
+
+        collectionID = colResponse.values.getAsJsonObject("PlantCollection").get("id").getAsString();
+
+        body.addProperty("plantCollectionID", collectionID);
+        body.addProperty("name", plant.name);
+        addNumberWithoutDecimal(body, "azote_fixation", plant.azoteFixing);
+        addNumberWithoutDecimal(body, "upgrade_ground", plant.upgradeGrnd);
+        addNumberWithoutDecimal(body, "water_fixation", plant.waterFixing);
+
+        System.out.println(imageFile.isFile());
+        if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
+            throw new IOException("Image file is invalid or not found: " + imageFile.getAbsolutePath());
+        }
+
+        ReturnType response = sendPostRequest("user/addPlant",body, imageFile);
+        if (response.status != 201){
+            throw  new IOException(response.values.toString());
+        }
+        return response;
+    }
 
     public ReturnType getPlant(String collectionID, String plantName) throws IOException{
         JsonObject body = new JsonObject();

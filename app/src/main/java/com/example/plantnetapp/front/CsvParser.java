@@ -2,40 +2,96 @@
 package com.example.plantnetapp.front;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.os.Build;
+import android.util.Log;
+
+import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class CsvParser {
-    /**
-     * Lit le CSV dans res/raw et retourne une liste de Plant.
-     * Chaque ligne : service;species;value;reliability;cultural_condition
-     * Ici on utilise species comme name, value comme description, et on laisse imageUrl vide.
+    /**ligne : service;species;value;reliability;cultural_condition
      */
-    public static List<Plant> parse(Context ctx, int rawResId) {
-        List<Plant> list = new ArrayList<>();
-        try {
-            InputStream is = ctx.getResources().openRawResource(rawResId);
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            // Sauter la première ligne
+    private static Boolean INSTANCE = false;
+    private static final int RESSOURCES_FILE = R.raw.data_1744126677780;
+    private static Map<String, Plant> plantInfoMap;
+    public static Map<String, Plant> createInstance(Context context){
+        if (!INSTANCE) {
+            INSTANCE = true;
+            plantInfoMap = parse(context);
+        }
+        return plantInfoMap;
+    }
+    private static Map<String, Plant> parse(Context ctx) {
+        Map<String, Plant> plantMap = new HashMap<>();
+
+        try (InputStream is = ctx.getResources().openRawResource(RESSOURCES_FILE);
+             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+
+            // Skip header line
             br.readLine();
+
             String line;
             while ((line = br.readLine()) != null) {
-                String[] cols = line.split(";");
-                if (cols.length >= 3) {
-                    String species = cols[1];
-                    String value   = cols[2];
-                    // Pas d’URL d’image dans le CSV, on peut laisser vide ou mettre un placeholder
-                    list.add(new Plant(species, value, ""));
+                String[] cols = line.split(";", -1);  // -1 keeps empty values
+                if (cols.length < 5) continue;  // Skip incomplete lines
+
+                String service = cols[0].trim();
+                String species = cols[1].trim();
+                String valueStr = cols[2].trim();
+                String reliabilityStr = cols[3].trim();
+                String culturalCondition = cols[4].trim();
+                // cols[3] and cols[4] available but unused in current logic
+
+                try {
+                    float value = Float.parseFloat(valueStr);
+                    float reliability = Float.parseFloat(reliabilityStr);
+                    Plant plant = plantMap.computeIfAbsent(species,
+                            k -> new Plant(null, species, 0, 0, 0));
+                    if (plant.culturalCondition.trim().isEmpty()){
+                        plant.culturalCondition = culturalCondition;
+                    }
+                    // Update plant properties based on service type
+                    switch (service) {
+                        case "storage_and_return_water":
+                            plant.waterFixing = value;
+                            plant.waterReliability = reliability;
+                            break;
+                        case "nitrogen_provision":
+                            plant.azoteFixing = value;
+                            plant.azoteReliability = reliability;
+                            break;
+                        case "soil_structuration":
+                            plant.upgradeGrnd = value;
+                            plant.upgradeReliability = reliability;
+                            break;
+                        default:
+                            continue;  // Skip unknown service types
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip lines with invalid numeric values
+                    continue;
                 }
             }
-            br.close();
+            return plantMap;
+
+        } catch (Resources.NotFoundException e) {
+            Log.e("PlantParser", "Resource not found: " + RESSOURCES_FILE, e);
+        } catch (IOException e) {
+            Log.e("PlantParser", "Error reading file", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("PlantParser", "Unexpected error", e);
         }
-        return list;
+        return null;
     }
 }

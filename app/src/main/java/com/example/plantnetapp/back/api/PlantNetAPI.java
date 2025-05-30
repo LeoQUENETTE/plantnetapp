@@ -276,7 +276,7 @@ public class PlantNetAPI {
         }
         request = ParameterStringBuilder.addGetParameter(request, "no-reject", noReject.toString(), false);
         if (nbResults > 0){
-            request = ParameterStringBuilder.addGetParameter(request, "nb-results", noReject.toString(), false);
+            request = ParameterStringBuilder.addGetParameter(request, "nb-results", Integer.toString(nbResults), false);
         }
         if (lang != null && !lang.trim().isEmpty()){
             request = ParameterStringBuilder.addGetParameter(request, "lang", lang, false);

@@ -7,7 +7,7 @@ import org.junit.Assert
 import org.junit.Test
 import java.io.File
 
-class PlantNetAPITest {
+class UselessPlantNetAPITest {
     private val api : PlantNetAPI = PlantNetAPI.createInstance()
     @Test
     fun apiConnectionTest() {

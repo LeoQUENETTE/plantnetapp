@@ -5,9 +5,11 @@ import com.example.plantnetapp.back.api.ReturnType;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User extends Entity{
+public class User extends Entity implements Serializable {
+    public final String id;
     public final String login;
     public String mdp;
     public final String firstName;

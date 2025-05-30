@@ -16,7 +16,7 @@ class ExternalBDDApiTest {
     private val     api : ExternalBDDApi = ExternalBDDApi.createInstance()
     private val testUser : User = User(null,"TestUser","2ee9edd7b02f41082bc33f0276bdedf1", "firstname","lastname","email", "phone")
     private val testCollection : PlantCollection = PlantCollection("testCollection",arrayListOf())
-    private val testPlant : Plant = Plant("rose", 0.5F, 0.75F, 0.6F)
+    private val testPlant : Plant = Plant("rose", 0.5F, 0.75F, 0.6F, null)
     @Test
     fun apiConnectionTest() {
         try{
@@ -125,6 +125,21 @@ class ExternalBDDApiTest {
             }catch (e : Exception){
                 Assert.fail(e.message)
             }
+        }
+    }
+    @Test
+    fun addPlantWithoutCollection(){
+        try{
+            val getUserResponse : ReturnType = api.login(testUser.login,testUser.mdp)
+            if (getUserResponse.status != 200){
+                Assert.fail("Error getting user : "+getUserResponse.values)
+            }
+            val userID = getUserResponse.values.getAsJsonObject("User").get("id").asString
+            val currentDirectory = System.getProperty("user.dir") + "/src/test/java/com/example/plantnetapp/"
+            val returnType : ReturnType = api.addPlantWithoutCollection(userID, testPlant, File(currentDirectory+"testImages/rose-rouge.jpeg"))
+            assertEquals(201,returnType.status)
+        }catch (e : Exception){
+            Assert.fail(e.message)
         }
     }
     @Test
@@ -264,7 +279,7 @@ class ExternalBDDApiTest {
             if (getPlantResponse.status != 200){
                 Assert.fail("Error getting plant : "+getPlantResponse.values.asString)
             }
-            val plant = Plant.plantFromJSON(getPlantResponse.values)
+            val plant = Plant.plantFromJSON(getPlantResponse.values, true)
             assertEquals(plant.name , testPlant.name)
         }
         catch (e : IOException){

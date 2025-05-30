@@ -1,5 +1,6 @@
 package com.example.plantnetapp.front;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +22,15 @@ public class HistoryAdapter
         implements Filterable {
 
     public interface OnHistoryClickListener {
-        void onItemClick(HistoryEntry entry);
+        void onItemClick(Plant entry);
     }
 
-    private final List<HistoryEntry> fullList;
-    private List<HistoryEntry> filteredList;
+    private final List<Plant> fullList;
+    private List<Plant> filteredList;
     private final OnHistoryClickListener listener;
 
     // ← On ajoute bien le listener ici
-    public HistoryAdapter(List<HistoryEntry> list, OnHistoryClickListener listener) {
+    public HistoryAdapter(List<Plant> list, OnHistoryClickListener listener) {
         this.fullList     = new ArrayList<>(list);
         this.filteredList = new ArrayList<>(list);
         this.listener     = listener;
@@ -43,9 +45,8 @@ public class HistoryAdapter
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int pos) {
-        HistoryEntry e = filteredList.get(pos);
-        holder.tvName.setText(e.getName());
-        holder.tvDate.setText(e.getDate());
+        Plant e = filteredList.get(pos);
+        holder.tvName.setText(e.name);
         holder.itemView.setOnClickListener(v -> listener.onItemClick(e));
     }
 
@@ -68,13 +69,12 @@ public class HistoryAdapter
         return new Filter() {
             @Override protected FilterResults performFiltering(CharSequence constraint) {
                 String query = constraint == null ? "" : constraint.toString().toLowerCase().trim();
-                List<HistoryEntry> result = new ArrayList<>();
+                List<Plant> result = new ArrayList<>();
                 if (query.isEmpty()) {
                     result.addAll(fullList);
                 } else {
-                    for (HistoryEntry e : fullList) {
-                        if (e.getName().toLowerCase().contains(query)
-                                || e.getDate().toLowerCase().contains(query)) {
+                    for (Plant e : fullList) {
+                        if (e.name.toLowerCase().contains(query)) {
                             result.add(e);
                         }
                     }
@@ -83,9 +83,10 @@ public class HistoryAdapter
                 fr.values = result;
                 return fr;
             }
+            @SuppressLint("NotifyDataSetChanged")
             @Override protected void publishResults(CharSequence constraint, FilterResults results) {
                 //noinspection unchecked
-                filteredList = (List<HistoryEntry>) results.values;
+                filteredList = (List<Plant>) results.values;
                 notifyDataSetChanged();
             }
         };

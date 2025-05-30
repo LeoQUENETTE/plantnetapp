@@ -8,10 +8,10 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +36,8 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
 
     @Override public void onBindViewHolder(VH holder, int pos) {
         Plant p = filteredList.get(pos);
-        holder.tvName.setText(p.getName());
-        holder.tvDesc.setText(p.getDescription());
+        holder.tvName.setText(p.name);
+        holder.tvDesc.setText("");
         // Glide.with(holder.iv.getContext()).load(p.getImageUrl()).into(holder.iv);
         holder.itemView.setOnClickListener(v -> listener.onClick(p));
     }
@@ -60,7 +60,7 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
 
     // Interface pour le clic
     public interface OnPlantClickListener {
-        void onClick(Plant plant);
+        void onClick(Plant uselessPlant);
     }
 
     // ----- Filterable -----
@@ -74,7 +74,7 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
                     result = fullList;
                 } else {
                     for (Plant p : fullList) {
-                        if (p.getName().toLowerCase().contains(query)) {
+                        if (p.name.toLowerCase().contains(query)) {
                             result.add(p);
                         }
                     }

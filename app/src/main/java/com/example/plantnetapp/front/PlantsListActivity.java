@@ -16,8 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class PlantsListActivity extends AppCompatActivity {
     private PlantAdapter adapter;
@@ -64,12 +68,12 @@ public class PlantsListActivity extends AppCompatActivity {
         });
 
         // Chargement des données depuis le CSV raw (res/raw/data_174412667780.csv)
-        List<Plant> plants = CsvParser.parse(this, R.raw.data_1744126677780);
+        List<Plant> plants = new ArrayList<>(Objects.requireNonNull(CsvParser.createInstance(this)).values());
 
         // RecyclerView + Adapter
         RecyclerView rv = findViewById(R.id.rvPlants);
         rv.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new PlantAdapter(plants, this::openDetailFor);
+        adapter = new PlantAdapter(plants, plant -> openDetailFor(plant));
         rv.setAdapter(adapter);
     }
 

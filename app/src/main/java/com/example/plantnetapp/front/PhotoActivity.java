@@ -1,9 +1,13 @@
 package com.example.plantnetapp.front;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -18,10 +22,17 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.User;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PhotoActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 10;
@@ -29,6 +40,8 @@ public class PhotoActivity extends AppCompatActivity {
             new String[]{Manifest.permission.CAMERA};
 
     private PreviewView previewView;
+
+    private static User connectedUser;
     private ImageCapture imageCapture;
     private Executor cameraExecutor;
 
@@ -36,6 +49,11 @@ public class PhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
+
+        User user = (User) getIntent().getSerializableExtra("connected_user");
+        if (user != null){
+            connectedUser = user;
+        }
 
         previewView = findViewById(R.id.previewView);
         Button btnCapture = findViewById(R.id.btnCapture);
@@ -84,23 +102,41 @@ public class PhotoActivity extends AppCompatActivity {
         if (imageCapture == null) return;
 
         // Fichier de sortie (dans getFilesDir())
-        File photoFile = new File(getFilesDir(),
-                "plantnet_" + System.currentTimeMillis() + ".jpg");
+        AtomicReference<File> photoFile = new AtomicReference<>(new File(getFilesDir(),
+                "plantnet_" + System.currentTimeMillis() + ".jpg"));
 
         ImageCapture.OutputFileOptions options =
-                new ImageCapture.OutputFileOptions.Builder(photoFile).build();
-
+                new ImageCapture.OutputFileOptions.Builder(photoFile.get()).build();
+        Log.d("CAMERA","Photo Prise");
         imageCapture.takePicture(
                 options,
                 cameraExecutor,
                 new ImageCapture.OnImageSavedCallback() {
+                    @SuppressLint("ResourceType")
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        runOnUiThread(() -> {
-                            // Start PreviewActivity with the image path
-                            Intent intent = new Intent(PhotoActivity.this, PreviewActivity.class);
-                            intent.putExtra("photo_path", photoFile.getAbsolutePath());
-                            startActivity(intent);
+                        ExecutorService executor = Executors.newSingleThreadExecutor();
+                        executor.submit(() -> {
+                            Bitmap bitmap = BitmapFactory.decodeResource(PhotoActivity.this.getResources(), R.drawable.juncusfiliformis_1);
+                            File outputFile = new File(PhotoActivity.this.getCacheDir(), "juncusfiliformis_1");
+                            try (FileOutputStream out = new FileOutputStream(outputFile)) {
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // ou JPEG selon besoin
+                                out.flush();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            Plant plant = Plant.addPlantNoCollection(outputFile, // TODO change with actual photo, only for the test
+                                    connectedUser, PhotoActivity.this);
+                            runOnUiThread(() -> {
+                                if (plant != null){
+                                    Intent intent = new Intent(PhotoActivity.this, DetailActivity.class);
+                                    intent.putExtra("returnMain", true);
+                                    intent.putExtra("user",connectedUser);
+                                    intent.putExtra("plantName", plant.name);
+                                    intent.putExtra("noCollection", true);
+                                    startActivity(intent);
+                                }
+                            });
                         });
                     }
 

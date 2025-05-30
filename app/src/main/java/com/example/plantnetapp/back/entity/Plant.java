@@ -1,21 +1,38 @@
 package com.example.plantnetapp.back.entity;
 
+import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.api.ExternalBDDApi;
+import com.example.plantnetapp.back.api.PlantNetAPI;
+import com.example.plantnetapp.back.api.ReturnType;
+import com.example.plantnetapp.front.CsvParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class Plant  extends Entity{
+public class Plant  extends Entity implements Serializable {
+    public String id = "";
     public final String name;
     public float azoteFixing = 0;
     public float upgradeGrnd = 0;
     public float waterFixing = 0;
+    public float azoteReliability = 0;
+    public float upgradeReliability = 0;
+    public float waterReliability = 0;
+
+    public String culturalCondition = "";
     public byte[] imageData = null;
     @Override
     public boolean equals(Object o) {
@@ -50,8 +67,11 @@ public class Plant  extends Entity{
         return false;
     }
 
-    public static Plant plantFromJSON (File directory, JsonObject object){
-        JsonObject plantObject = object.getAsJsonObject("plant");
+    public static Plant plantFromJSON (JsonObject object, Boolean indent){
+        JsonObject plantObject = object;
+        if (indent){
+            plantObject = object.getAsJsonObject("plant");
+        }
         String name = plantObject.get("name").getAsString();
         float azote_fixation = plantObject.get("azote_fixation").getAsFloat();
         float upgrade_ground = plantObject.get("upgrade_ground").getAsFloat();
@@ -64,5 +84,60 @@ public class Plant  extends Entity{
             imageBytes = Base64.getDecoder().decode(image_data);
         }
         return new Plant(name,azote_fixation,upgrade_ground,water_fixation, imageBytes);
+    }
+    public static Plant addPlantNoCollection(File image, User currentUser, Context context){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        PlantNetAPI api = PlantNetAPI.createInstance();
+        try{
+            ReturnType apiResponse = api.identify(image,null,null,null,1,null,null,null);
+            JsonObject mostPossiblePlant = apiResponse.values.getAsJsonArray("results").get(0).getAsJsonObject();
+            String plantName = mostPossiblePlant.getAsJsonObject("species").get("scientificNameWithoutAuthor").getAsString();
+            Map<String, Plant> plants = CsvParser.createInstance(context);
+            if (plants == null){
+                return null;
+            }
+            Plant plant = plants.get(plantName);
+            if (plant == null){
+                return null;
+            }
+            ReturnType returnType = bdd.addPlantWithoutCollection(currentUser.id, plant, image);
+            System.out.println(returnType.values.toString());
+            return plant;
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static List<Plant> getAllPlants(String collectionID){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = bdd.getAllPlants(collectionID);
+            List<JsonElement> plantJsonArray = response.values.getAsJsonArray("plants").asList();
+            if (!plantJsonArray.isEmpty()){
+                ArrayList<Plant> plantList = new ArrayList<>();
+                for (JsonElement plantJsonE : plantJsonArray){
+                    JsonObject plantJsonO = plantJsonE.getAsJsonObject();
+                    Plant newPlant = Plant.plantFromJSON(plantJsonO, false);
+                    plantList.add(newPlant);
+                }
+                return plantList;
+            }else{
+                return null;
+            }
+
+        }catch (IOException e){
+            return null;
+        }
+    }
+
+    public static Plant getPlant(String collectionID, String plantName){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = bdd.getPlant(collectionID, plantName);
+            return Plant.plantFromJSON(response.values, true);
+        }catch (IOException e){
+            return null;
+        }
     }
 }

@@ -27,7 +27,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Autres activités -->
         <activity android:name=".front.RegisterActivity"    android:exported="false"/>
         <activity android:name=".front.MainActivity"        android:exported="false"/>
         <activity android:name=".front.PhotoActivity"       android:exported="false"/>
@@ -36,7 +35,6 @@
         <activity android:name=".front.DetailActivity"      android:exported="false"/>
         <activity android:name=".front.CollectionDetailActivity" android:exported="false"/>
         <activity android:name=".front.ResultActivity" android:exported="false"/>
-        <activity android:name=".front.PreviewActivity" android:exported="false"/>
 
 
     </application>

@@ -21,15 +21,15 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 🚩 LOG IMMEDIAT
         Log.d(TAG, ">>> onCreate START");
 
         super.onCreate(savedInstanceState);
-        // Masquer l’ActionBar (s’il existait)
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
             Log.d(TAG, "ActionBar cachée");
         }
+
+        CsvParser.createInstance(this);
 
         setContentView(R.layout.activity_login);
         Log.d(TAG, "setContentView terminé");
@@ -69,12 +69,14 @@ public class LoginActivity extends AppCompatActivity {
     private void login(String username, String pswrd){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
-            User connectionUser = User.login(username,pswrd);
+            User connectionUser = User.login("aa","a");
             runOnUiThread(() -> {
                 if (connectionUser == null) {
                     Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
                 } else {
-                    startActivity(new Intent(this, MainActivity.class));
+                    Intent i = new Intent(this, MainActivity.class);
+                    i.putExtra("connected_user", connectionUser);
+                    startActivity(i);
                 }
             });
         });

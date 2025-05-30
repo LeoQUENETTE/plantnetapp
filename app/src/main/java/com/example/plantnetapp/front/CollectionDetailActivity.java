@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.entity.Plant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,7 @@ public class CollectionDetailActivity extends AppCompatActivity {
         String collectionName = getIntent().getStringExtra("collectionName");
         findViewById(R.id.tvCollectionDetailTitle)
                 .setTag(collectionName); // si tu veux l'afficher ailleurs
-
-        // 3) Mock de la liste des plantes de la collection
         List<Plant> plants = new ArrayList<>();
-        plants.add(new Plant("Rose", "Belle fleur rouge", "url_rose.png"));
-        plants.add(new Plant("Tulipe", "Fleur du printemps", "url_tulipe.png"));
-        plants.add(new Plant("Orchidée", "Fleur exotique", "url_orchidee.png"));
-        // … ajoute autant que tu veux
 
         // 4) Setup RecyclerView
         RecyclerView rv = findViewById(R.id.rvPlantsInCollection);

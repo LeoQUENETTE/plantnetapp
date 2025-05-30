@@ -3,12 +3,12 @@ package com.example.plantnetapp.front;
 
 import java.io.Serializable;
 
-public class Plant implements Serializable {
+public class UselessPlant implements Serializable {
     private String name;
     private String description;
     private String imageUrl;
 
-    public Plant(String name, String description, String imageUrl) {
+    public UselessPlant(String name, String description, String imageUrl) {
         this.name        = name;
         this.description = description;
         this.imageUrl    = imageUrl;
