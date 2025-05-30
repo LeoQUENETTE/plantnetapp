@@ -79,4 +79,14 @@ public class User extends Entity implements Serializable {
             return null;
         }
     }
+
+    public static boolean deleteUser(String userID){
+        ExternalBDDApi api = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = api.deleteUser(userID);
+            return response.status == 200;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

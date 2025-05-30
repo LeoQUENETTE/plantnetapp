@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class RegisterActivity extends AppCompatActivity {
-    private EditText etUsername, etFirstName, etLastName, etPswrd, etRole, etMail, etPhone;
+    private EditText etUsername, etFirstName, etLastName, etPswrd, etMail, etPhone;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -35,18 +35,21 @@ public class RegisterActivity extends AppCompatActivity {
         etFirstName = findViewById(R.id.etFirstName);
         etLastName  = findViewById(R.id.etLastName);
         etPswrd = findViewById(R.id.etMdp);
-        etRole      = findViewById(R.id.etRole);
         etMail      = findViewById(R.id.etMail);
         etPhone     = findViewById(R.id.etPhone);
 
-        // 3) Bouton d’inscription
         Button btnRegister = findViewById(R.id.btnRegister);
+
+        Button btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener( v -> {
+            finish();
+        });
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (validateInputs()) {
                     // Ici la logique d’inscription réelle
-                    Toast.makeText(RegisterActivity.this, "Inscription réussie !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, R.string.registerSucess, Toast.LENGTH_SHORT).show();
                     register(etUsername.getText().toString(),
                             etPswrd.getText().toString(),
                             etFirstName.getText().toString(),
@@ -63,7 +66,6 @@ public class RegisterActivity extends AppCompatActivity {
                 TextUtils.isEmpty(etFirstName.getText())||
                 TextUtils.isEmpty(etLastName.getText()) ||
                 TextUtils.isEmpty(etPswrd.getText())      ||
-                TextUtils.isEmpty(etRole.getText())     ||
                 TextUtils.isEmpty(etMail.getText())     ||
                 TextUtils.isEmpty(etPhone.getText())) {
 

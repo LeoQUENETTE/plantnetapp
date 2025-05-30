@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">plantnetapp</string>
+    <string name="loginText">Nom d\'utilisateur</string>
+    <string name="loginBtnText">Se connecter</string>
+    <string name="registerBtnText">Inscritption</string>
+    <string name="pswrdETHint">Mot de passe</string>
+    <string name="usernameETHint">Nom d\'utilisateur</string>
+    <string name="btnPhotoTxt">Prendre une photo</string>
+    <string name="Infos">Infos</string>
+    <string name="btnCollectionsText">Collections</string>
+    <string name="bgrd">bgrd</string>
+    <string name="settings">Settings</string>
+    <string name="languages">Langues</string>
+    <string name="deleteAccount">Suppression de compte</string>
+    <string name="deleteuserErrorMsg">Impossible de supprimer l\'utilisateur</string>
+    <string name="registerText">Inscription</string>
+    <string name="submitText">Valider</string>
+    <string name="backText">Retour</string>
+    <string name="registerSucess">Inscription réussie !</string>
 </resources>

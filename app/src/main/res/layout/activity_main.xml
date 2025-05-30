@@ -1,5 +1,6 @@
 <!-- activity_main.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,43 +8,89 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:contentDescription="@string/bgrd"
         android:src="@drawable/bg_main"
         android:scaleType="centerCrop"/>
 
-    <!-- Bouton invisible pour "Prendre une photo" -->
-    <Button
-        android:id="@+id/btnPhoto"
-        android:layout_width="500dp"
-        android:layout_height="300dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="130dp"
-        android:text=""
-        android:background="@android:color/transparent"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Prendre une photo"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:weightSum="1"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0.dp"
+                android:layout_weight="0.2"
+                android:gravity="end"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+                <ImageButton
+                    android:id="@+id/btnSettings"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/gear_icon"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="20dp"
+                    android:contentDescription="@string/settings"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.8"
+                android:weightSum="1"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights,UselessParent">
+                <!--    android:background="@drawable/pellicule"-->
+                <Button
+                    android:id="@+id/btnPhoto"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.8"
+                    android:layout_marginTop="130dp"
+                    android:text="@string/btnPhotoTxt"
+                    android:scaleType="centerCrop"
+                    android:backgroundTint="#90A898"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/btnPhotoTxt"
+                    tools:ignore="NestedWeights" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5"
+            android:weightSum="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/btnHistorique"
+                android:layout_width="360dp"
+                android:layout_height="150dp"
+                android:text="@string/btnCollectionsText"
+                android:backgroundTint="#90A898"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/btnCollectionsText"/>
 
-    <!-- Bouton invisible pour "Historique" -->
-    <Button
-        android:id="@+id/btnHistorique"
-        android:layout_width="360dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="490dp"
-        android:text=""
-        android:background="@android:color/transparent"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Historique"/>
+            <!-- Bouton invisible pour "List" -->
+            <Button
+                android:id="@+id/btnInfos"
+                android:layout_width="360dp"
+                android:layout_height="150dp"
+                android:text="@string/Infos"
+                android:backgroundTint="#90A898"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/Infos"/>
+        </LinearLayout>
+    </LinearLayout>
 
-    <!-- Bouton invisible pour "List" -->
-    <Button
-        android:id="@+id/btnInfos"
-        android:layout_width="360dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="665dp"
-        android:text=""
-        android:background="@android:color/transparent"
-        android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="List"/>
+
 
 </RelativeLayout>

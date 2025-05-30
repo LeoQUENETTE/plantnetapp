@@ -1,11 +1,11 @@
 <!-- activity_login.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="bottom">
 
     <!-- Image de fond -->
-
-    <!-- Conteneur pour formulaire centré -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,59 +15,81 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="500dp"
+        android:layout_alignParentBottom="true"
         android:background="#55FFFFFF"
         android:elevation="4dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:padding="20dp">
 
-        <TextView
-            android:id="@+id/tvLoginTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:text="                            "
-            android:textColor="#000"
-            android:textSize="24sp" />
-
-        <EditText
-            android:id="@+id/etUsername"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:background="#FFFFFF"
-            android:hint="Nom d'utilisateur"
-            android:padding="10dp" />
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <EditText
+                android:id="@+id/etUsername"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:autofillHints=""
+                android:background="#FFFFFF"
+                android:hint="@string/usernameETHint"
+                android:inputType="text"
+                android:padding="20dp" />
+        </LinearLayout>
 
-        <EditText
-            android:id="@+id/etPassword"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="100dp"
-            android:background="#FFFFFF"
-            android:hint="Mot de passe"
-            android:inputType="textPassword"
-            android:padding="10dp" />
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:autofillHints=""
+                android:background="#FFFFFF"
+                android:hint="@string/pswrdETHint"
+                android:inputType="textPassword"
+                android:padding="20dp" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btnLogin"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-60dp"
-            android:background="@android:color/transparent"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:text="Se connecter"
-            android:textColor="#4D000000" />
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/btnLogin"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="#728579"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/loginBtnText" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/tvRegister"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="45dp"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:text=""
-            android:background="@android:color/transparent"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/tvRegister"
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/registerBtnText"
+                android:backgroundTint="#728579"
+                />
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
