@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_more_info"
+        android:title="@string/more_info"
+        android:icon="@android:drawable/ic_menu_info_details" />
+
+    <item
+        android:id="@+id/nav_delete"
+        android:title="@string/delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:titleTextColor="#FF0000" />
+</menu>

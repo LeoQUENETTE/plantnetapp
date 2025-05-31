@@ -8,10 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -21,40 +26,59 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class PhotoActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final String[] REQUIRED_PERMISSIONS =
             new String[]{Manifest.permission.CAMERA};
-
+    private User user;
     private PreviewView previewView;
-
-    private static User connectedUser;
     private ImageCapture imageCapture;
     private Executor cameraExecutor;
+    private TextView loadingMessageView;
+    private AlertDialog loadingDialog;
+    private AlertDialog addCollectionDialog;
+    private List<String> collectionName;
+    private File outputFile;
+    private Plant plant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
 
-        User user = (User) getIntent().getSerializableExtra("connected_user");
-        if (user != null){
-            connectedUser = user;
+        User foundUser = (User) getIntent().getSerializableExtra("connected_user");
+        if (foundUser == null){
+            finish();
+            return;
         }
-
+        user = foundUser;
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        getCollectionNames(null);
         previewView = findViewById(R.id.previewView);
         Button btnCapture = findViewById(R.id.btnCapture);
 
@@ -68,6 +92,21 @@ public class PhotoActivity extends AppCompatActivity {
         }
 
         btnCapture.setOnClickListener(v -> takePhoto());
+    }
+
+    private void getCollectionNames(Runnable onfinish) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            List<PlantCollection> collection = PlantCollection.getAllPlantCollection(user.id);
+            if (collection == null || collection.isEmpty()){
+                collectionName = new ArrayList<>();
+            }else{
+                collectionName = collection.stream().map(c -> c.name).collect(Collectors.toList());
+            }
+            executor.shutdown();
+
+            runOnUiThread(onfinish);
+        });
     }
 
     private void startCamera() {
@@ -111,29 +150,28 @@ public class PhotoActivity extends AppCompatActivity {
                     @SuppressLint("ResourceType")
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        showLoadingDialog(getString(R.string.loadingStartPhoto));
+                        Bitmap bitmap = BitmapFactory.decodeResource(PhotoActivity.this.getResources(), R.drawable.juncusfiliformis_1);
+                        outputFile = new File(PhotoActivity.this.getCacheDir(), "juncusfiliformis_1");
+                        try (FileOutputStream out = new FileOutputStream(outputFile)) {
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // ou JPEG selon besoin
+                            out.flush();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                         ExecutorService executor = Executors.newSingleThreadExecutor();
                         executor.submit(() -> {
-                            Bitmap bitmap = BitmapFactory.decodeResource(PhotoActivity.this.getResources(), R.drawable.juncusfiliformis_1);
-                            File outputFile = new File(PhotoActivity.this.getCacheDir(), "juncusfiliformis_1");
-                            try (FileOutputStream out = new FileOutputStream(outputFile)) {
-                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // ou JPEG selon besoin
-                                out.flush();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            Plant plant = Plant.addPlantNoCollection(outputFile, // TODO change with actual photo, only for the test
-                                    connectedUser, PhotoActivity.this);
+                            updateLoadingMessage(getString(R.string.loadingAnalysePhoto));
+                            plant = Plant.addPlantNoCollection(outputFile, // TODO change with actual photo, only for the test
+                                    user, PhotoActivity.this);
                             runOnUiThread(() -> {
-                                if (plant != null){
-                                    Intent intent = new Intent(PhotoActivity.this, DetailActivity.class);
-                                    intent.putExtra("returnMain", true);
-                                    intent.putExtra("user",connectedUser);
-                                    intent.putExtra("plantName", plant.name);
-                                    intent.putExtra("noCollection", true);
-                                    startActivity(intent);
-                                }
+                                dismissLoadingDialog();
+                                showAddToCollectionDialog();
                             });
+                            executor.shutdown();
                         });
+
+
                     }
 
                     @Override
@@ -169,6 +207,129 @@ public class PhotoActivity extends AppCompatActivity {
             } else {
                 finish(); // ou affiche un message
             }
+        }
+    }
+    private void updateLoadingMessage(String message) {
+        runOnUiThread(() -> {
+            if (loadingMessageView != null) {
+                loadingMessageView.setText(message);
+            }
+        });
+    }
+
+    private void dismissLoadingDialog() {
+        runOnUiThread(() -> {
+            if (loadingDialog != null && loadingDialog.isShowing()) {
+                loadingDialog.dismiss();
+            }
+        });
+    }
+    private void showLoadingDialog(String initialMessage) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_loading, null);
+        loadingMessageView = dialogView.findViewById(R.id.loadingMessage);
+        loadingMessageView.setText(initialMessage);
+
+        loadingDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        loadingDialog.show();
+    }
+
+    private void showAddToCollectionDialog(){
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_to_collection, null);
+        RecyclerView recyclerView = dialogView.findViewById(R.id.collectionRecyclerView);
+        CollectionAdapterCheckbox adapter = new CollectionAdapterCheckbox(collectionName,() -> {
+            addCollectionDialog.cancel();
+            getNewCollectionName();
+        });
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+        addCollectionDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .setPositiveButton("OK", (d, w) -> {
+                    addPlantInCollections(adapter.getCheckedItems());
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+
+        addCollectionDialog.show();
+    }
+    private void getNewCollectionName(){
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_collection, null);
+        AlertDialog addCollectionDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+        addCollectionDialog.show();
+        EditText etCollectionName = addCollectionDialog.findViewById(R.id.textCollection);
+        Button submitBtn = addCollectionDialog.findViewById(R.id.addCollection);
+        if (submitBtn == null){
+            addCollectionDialog.cancel();
+            return;
+        }
+        submitBtn.setOnClickListener(v -> {
+            if (etCollectionName != null && !etCollectionName.getText().toString().trim().isEmpty()){
+                showLoadingDialog(getText(R.string.loadingCreateCollection).toString());
+                addCollection(etCollectionName.getText().toString());
+                dismissLoadingDialog();
+                addCollectionDialog.cancel();
+                getCollectionNames(this::showAddToCollectionDialog);
+            } else if (etCollectionName.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, getText(R.string.noCollectionName), Toast.LENGTH_SHORT).show();
+            }
+        });
+        Button cancelBtn = addCollectionDialog.findViewById(R.id.cancelAddCollection);
+        if (cancelBtn == null){
+            addCollectionDialog.cancel();
+            return;
+        }
+        cancelBtn.setOnClickListener(v -> {
+            finish();
+            addCollectionDialog.cancel();
+        });
+    }
+    private void addCollection(String collectionName){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            boolean result = PlantCollection.addCollection(user.id,collectionName);
+            if (result){
+                Toast.makeText(this, getString(R.string.addCollectionSuccess),Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, getString(R.string.addCollectionFailed),Toast.LENGTH_SHORT).show();
+            }
+            executor.shutdown();
+        });
+
+    }
+    private void addPlantInCollections(Set<Integer> selected){
+        if (selected.isEmpty()){
+            showPlant(plant);
+            return;
+        }
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
+        for (int index : selected) {
+            executor.submit(() -> {
+                String name = collectionName.get(index);
+                PlantCollection collection = PlantCollection.getCollection(user.id,name);
+                Plant.addPlant(outputFile,collection, PhotoActivity.this);
+            });
+        }
+        showPlant(plant);
+        executor.shutdown();
+    }
+    private void showPlant(Plant plant){
+        if (plant != null){
+            Intent intent = new Intent(PhotoActivity.this, DetailActivity.class);
+            intent.putExtra("returnMain", true);
+            intent.putExtra("user",user);
+            intent.putExtra("plantName", plant.name);
+            intent.putExtra("noCollection", true);
+            dismissLoadingDialog();
+            startActivity(intent);
         }
     }
 }

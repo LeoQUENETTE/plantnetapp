@@ -65,6 +65,15 @@ public class PlantCollection extends Entity implements Serializable {
             return null;
         }
     }
+    public static PlantCollection getCollection(String userID, String collectionName){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = bdd.getPlantCollection(userID,collectionName);
+            return PlantCollection.plantCollectionFromJSON(response.values);
+        }catch (Exception e){
+            return null;
+        }
+    }
 
     public static List<PlantCollection> getAllPlantCollection(String userID){
         ExternalBDDApi bdd = ExternalBDDApi.createInstance();
@@ -94,5 +103,24 @@ public class PlantCollection extends Entity implements Serializable {
             }
         }
         return plantCollections;
+    }
+
+    public static boolean addCollection(String userID, String collectionName){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = bdd.addPlantCollection(userID, collectionName);
+            return response.status == 201;
+        }catch (IOException e){
+            return false;
+        }
+    }
+    public static boolean deleteCollection(String userID, String collectionName){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = bdd.deletePlantCollection(userID, collectionName);
+            return response.status == 200;
+        }catch (Exception e){
+            return false;
+        }
     }
 }

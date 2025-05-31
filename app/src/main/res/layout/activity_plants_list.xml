@@ -12,15 +12,6 @@
         android:src="@drawable/bg_list"
         android:scaleType="centerCrop" />
 
-    <!-- 2) Contenu superposé -->
-    <FrameLayout
-        android:id="@+id/searchContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:padding="8dp"
-        android:background="#80000000"/>
-
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -32,6 +23,7 @@
             android:id="@+id/btnBack"
             android:layout_width="150dp"
             android:layout_height="60dp"
+            android:text="@string/goBack"
             android:background="@android:color/transparent"
             android:foreground="?attr/selectableItemBackgroundBorderless"
             android:layout_marginBottom="8dp"/>
@@ -41,10 +33,10 @@
             android:id="@+id/svSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Rechercher une plante…"
-            android:background="#80000000"
+            android:layout_marginBottom="8dp"
+            android:background="#80E4DEDE"
             android:iconifiedByDefault="false"
-            android:layout_marginBottom="8dp"/>
+            android:queryHint="Rechercher une plante…" />
 
         <!-- Liste déroulante -->
         <androidx.recyclerview.widget.RecyclerView

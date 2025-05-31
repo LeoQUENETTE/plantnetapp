@@ -1,11 +1,15 @@
 package com.example.plantnetapp.front;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,12 +17,34 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.PlantCollection;
+import com.example.plantnetapp.back.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CollectionDetailActivity extends AppCompatActivity {
     private PlantAdapter adapter;
+    private User user;
+    private PlantCollection collection;
+    private List<Plant> plants;
+    private final ActivityResultLauncher<Intent> updateCollectionLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() != RESULT_OK) {
+                            return;
+                        }
+                        Intent data = result.getData();
+                        if (data == null){
+                            return;
+                        }
+                        Boolean updateCollection = data.getBooleanExtra("updateCollection", false);
+                        if (!updateCollection){
+                            return;
+                        }
+                        getCollectionPlants(this::setUp);
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,33 +53,40 @@ public class CollectionDetailActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_collection_detail);
 
-        // 1) Bouton Retour
-        ImageButton btnBack = findViewById(R.id.btnBackCollection);
-        btnBack.setOnClickListener(v -> finish());
+        User foundUser = (User) getIntent().getSerializableExtra("connected_user");
+        PlantCollection foundCollection = (PlantCollection) getIntent().getSerializableExtra("selected_collection");
+        if (foundUser == null || foundCollection == null){
+            finish();
+            return;
+        }
+        try {
+            user = foundUser;
+            collection = foundCollection;
+            getCollectionPlants(this::setUp);
 
-        // 2) Récupère le nom/id de la collection (passés par Intent)
-        String collectionName = getIntent().getStringExtra("collectionName");
-        findViewById(R.id.tvCollectionDetailTitle)
-                .setTag(collectionName); // si tu veux l'afficher ailleurs
-        List<Plant> plants = new ArrayList<>();
+            ImageButton btnBack = findViewById(R.id.btnBackCollection);
+            btnBack.setOnClickListener(v -> finish());
 
-        // 4) Setup RecyclerView
-        RecyclerView rv = findViewById(R.id.rvPlantsInCollection);
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new PlantAdapter(plants, plant -> {
-            // Au clic sur une plante, renvoyer sur le détail
-            Intent i = new Intent(CollectionDetailActivity.this, DetailActivity.class);
-            i.putExtra("plant", plant);
-            startActivity(i);
-        });
-        rv.setAdapter(adapter);
+            TextView tv = findViewById(R.id.tvCollectionDetailTitle);
+            tv.setText(collection.name);
+        }catch (Exception e){
+            finish();
+        }
+    }
 
-        // 5) Barre de recherche filtrant la liste des plantes
+    private void setUp(){
+        setupSearchView();
+        if (plants != null){
+            setupRecyclerView();
+        }
+    }
+    private void setupSearchView(){
         SearchView sv = findViewById(R.id.svCollection);
-        // texte en blanc
-        EditText et = sv.findViewById(androidx.appcompat.R.id.search_src_text);
-        et.setTextColor(Color.WHITE);
-        et.setHintTextColor(0x88FFFFFF);
+        EditText svText = sv.findViewById(
+                androidx.appcompat.R.id.search_src_text
+        );
+        svText.setTextColor(Color.WHITE);
+        svText.setHintTextColor(0x88000000);
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String q) {
@@ -65,6 +98,41 @@ public class CollectionDetailActivity extends AppCompatActivity {
                 adapter.getFilter().filter(t);
                 return false;
             }
+        });
+    }
+    private void setupRecyclerView(){
+        try {
+            RecyclerView rv = findViewById(R.id.rvPlantsInCollection);
+            rv.setLayoutManager(new LinearLayoutManager(this));
+            if (adapter == null){
+                adapter = new PlantAdapter(plants, plant -> {
+                    // Au clic sur une plante, renvoyer sur le détail
+                    Intent i = new Intent(CollectionDetailActivity.this, DetailActivity.class);
+                    i.putExtra("plantName", plant.name);
+                    i.putExtra("collection", collection);
+                    i.putExtra("user", user);
+                    updateCollectionLauncher.launch(i);
+                });
+            }
+            rv.setAdapter(adapter);
+        }catch (Exception e){
+            finish();
+        }
+    }
+
+    private void getCollectionPlants(Runnable onFinish){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            List<Plant> updatedPlants = Plant.getAllPlants(collection.id);
+            plants = updatedPlants;
+            runOnUiThread(() -> {
+                if (adapter != null) {
+                    adapter.setPlants(updatedPlants);
+                }
+                onFinish.run();
+            });
+
+            executor.shutdown();
         });
     }
 }

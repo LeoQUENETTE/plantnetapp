@@ -42,14 +42,6 @@ public class PlantsListActivity extends AppCompatActivity {
         // Configuration du SearchView et de son conteneur flou
         SearchView sv = findViewById(R.id.svSearch);
 
-        // 1) Conteneur semi-transparent + blur (API 31+)
-        View searchContainer = findViewById(R.id.searchContainer);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            searchContainer.setRenderEffect(
-                    RenderEffect.createBlurEffect(20f, 20f, Shader.TileMode.CLAMP)
-            );
-        }
-
         // 2) Texte et hint en blanc
         EditText searchEditText = sv.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(Color.WHITE);

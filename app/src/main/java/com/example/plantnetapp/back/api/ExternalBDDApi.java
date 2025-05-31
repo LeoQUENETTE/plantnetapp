@@ -19,6 +19,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -359,24 +360,32 @@ public class ExternalBDDApi {
     }
 
     public ReturnType addPlant(String collectionID, Plant plant,  File imageFile) throws IOException{
-        JsonObject body = new JsonObject();
-        body.addProperty("plantCollectionID", collectionID);
-        body.addProperty("name", plant.name);
-        body.addProperty("azote_fixation", plant.azoteFixing);
-        body.addProperty("upgrade_ground", plant.upgradeGrnd);
-        body.addProperty("water_fixation", plant.waterFixing);
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("plantCollectionID", collectionID);
+            body.addProperty("name", plant.name);
+            body.addProperty("azote_fixation", plant.azoteFixing);
+            body.addProperty("upgrade_ground", plant.upgradeGrnd);
+            body.addProperty("water_fixation", plant.waterFixing);
 
-        System.out.println(imageFile.isFile());
-        if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
-            throw new IOException("Image file is invalid or not found: " + imageFile.getAbsolutePath());
+            System.out.println(imageFile.isFile());
+            if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
+                throw new IOException("Image file is invalid or not found: " + imageFile.getAbsolutePath());
+            }
+
+            ReturnType response = sendPostRequest("user/addPlant",body, imageFile);
+            if (response.status != 201){
+                if (Objects.equals(response.values.get("message").getAsString(), "Plant already exist")){
+                    return response;
+                }
+                throw  new IOException(response.values.toString());
+            }
+            System.out.println(response);
+            return response;
+        }catch (IOException e){
+            return null;
         }
 
-        ReturnType response = sendPostRequest("user/addPlant",body, imageFile);
-        if (response.status != 201){
-            throw  new IOException(response.values.toString());
-        }
-        System.out.println(response);
-        return response;
     }
     private void addNumberWithoutDecimal(JsonObject obj, String key, float value) {
         if (value == (int) value) {
@@ -412,6 +421,9 @@ public class ExternalBDDApi {
 
         ReturnType response = sendPostRequest("user/addPlant",body, imageFile);
         if (response.status != 201){
+            if (Objects.equals(response.values.get("message").getAsString(), "Plant already exist")){
+                return response;
+            }
             throw  new IOException(response.values.toString());
         }
         return response;

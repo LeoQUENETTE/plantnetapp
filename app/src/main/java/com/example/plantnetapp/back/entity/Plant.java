@@ -85,6 +85,28 @@ public class Plant  extends Entity implements Serializable {
         }
         return new Plant(name,azote_fixation,upgrade_ground,water_fixation, imageBytes);
     }
+    public static Plant addPlant(File image,PlantCollection collection,Context context){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        PlantNetAPI api = PlantNetAPI.createInstance();
+        try{
+            ReturnType apiResponse = api.identify(image,null,null,null,1,null,null,null);
+            JsonObject mostPossiblePlant = apiResponse.values.getAsJsonArray("results").get(0).getAsJsonObject();
+            String plantName = mostPossiblePlant.getAsJsonObject("species").get("scientificNameWithoutAuthor").getAsString();
+            Map<String, Plant> plants = CsvParser.createInstance(context);
+            if (plants == null){
+                return null;
+            }
+            Plant plant = plants.get(plantName);
+            if (plant == null){
+                return null;
+            }
+            bdd.addPlant(collection.id, plant, image);
+            return plant;
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
     public static Plant addPlantNoCollection(File image, User currentUser, Context context){
         ExternalBDDApi bdd = ExternalBDDApi.createInstance();
         PlantNetAPI api = PlantNetAPI.createInstance();
@@ -100,12 +122,22 @@ public class Plant  extends Entity implements Serializable {
             if (plant == null){
                 return null;
             }
-            ReturnType returnType = bdd.addPlantWithoutCollection(currentUser.id, plant, image);
-            System.out.println(returnType.values.toString());
+            bdd.addPlantWithoutCollection(currentUser.id, plant, image);
             return plant;
         }
         catch (Exception e) {
             return null;
+        }
+    }
+
+    public static boolean deletePlant(String collectionID, String plantName){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try {
+            ReturnType response = bdd.deletePlant(collectionID, plantName);
+            return response != null && response.status == 200;
+        } catch (Exception e) {
+            Log.e("PlantDelete", "Error deleting plant", e);
+            return false;
         }
     }
 
@@ -126,7 +158,7 @@ public class Plant  extends Entity implements Serializable {
                 return null;
             }
 
-        }catch (IOException e){
+        }catch (Exception e){
             return null;
         }
     }

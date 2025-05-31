@@ -17,4 +17,24 @@
     <string name="submitText">Valider</string>
     <string name="backText">Retour</string>
     <string name="registerSucess">Inscription réussie !</string>
+    <string name="loadingStartPhoto">Récupération de la photo en cours...</string>
+    <string name="loadingAnalysePhoto">Analyse et sauvegarde de la photo...</string>
+    <string name="loadingChangeActivityPhoto">Affichage des informations...</string>
+    <string name="addToCollectionText">Voulez vous rajouter la plante à une collection ?</string>
+    <string name="create_new_collection">+ Ajouter une collection</string>
+    <string name="collection_name">Nom de la collection</string>
+    <string name="ETHintCollectioName">Nom de la collection</string>
+    <string name="cancel">Annuler</string>
+    <string name="noCollectionName">Veuillez donner un nom à la collection</string>
+    <string name="addCollectionSuccess">Création d\'une collection réussi</string>
+    <string name="addCollectionFailed">Echec de l\'ajout de la collection</string>
+    <string name="loadingCreateCollection">Create collection</string>
+    <string name="goBack">Retour</string>
+    <string name="tvPlantName">Nom de la plante</string>
+    <string name="more_info">En savoir plus</string>
+    <string name="delete">Supprimer</string>
+    <string name="menu">Menu</string>
+    <string name="collectionsText">Mes collections</string>
+    <string name="full_historique">Historique complet</string>
+    <string name="search_view_historique">Rechercher une plante…</string>
 </resources>

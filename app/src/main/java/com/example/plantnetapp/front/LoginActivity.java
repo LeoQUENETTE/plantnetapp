@@ -3,14 +3,16 @@ package com.example.plantnetapp.front;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.plantnetapp.R;
-import com.example.plantnetapp.back.api.ExternalBDDApi;
 import com.example.plantnetapp.back.entity.User;
 
 import java.util.concurrent.ExecutorService;
@@ -18,6 +20,8 @@ import java.util.concurrent.Executors;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
+    private TextView loadingMessageView;
+    private AlertDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,51 +30,71 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
-            Log.d(TAG, "ActionBar cachée");
         }
 
         CsvParser.createInstance(this);
 
         setContentView(R.layout.activity_login);
-        Log.d(TAG, "setContentView terminé");
 
         EditText username = findViewById(R.id.etUsername);
         EditText pswrd = findViewById(R.id.etPassword);
-        // Pour vérifier visuellement
-        Toast.makeText(this, "LoginActivity lancé", Toast.LENGTH_SHORT).show();
 
-        // Reste de ton code…
         TextView tvRegister = findViewById(R.id.tvRegister);
         tvRegister.setOnClickListener(v -> {
-            Log.d(TAG, "Clique sur Créer un compte");
             startActivity(new Intent(this, RegisterActivity.class));
         });
-        Log.d(TAG, "Listener tvRegister configuré");
 
         Button btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(v -> {
-            Log.d(TAG, "Clique sur Se connecter");
             login(username.getText().toString(), pswrd.getText().toString());
         });
-        Log.d(TAG, "Listener btnLogin configuré");
     }
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart()");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume()");
+    }
+    private void updateLoadingMessage(String message) {
+        runOnUiThread(() -> {
+            if (loadingMessageView != null) {
+                loadingMessageView.setText(message);
+            }
+        });
+    }
+
+    private void dismissLoadingDialog() {
+        runOnUiThread(() -> {
+            if (loadingDialog != null && loadingDialog.isShowing()) {
+                loadingDialog.dismiss();
+            }
+        });
+    }
+    private void showLoadingDialog(String initialMessage) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_loading, null);
+        loadingMessageView = dialogView.findViewById(R.id.loadingMessage);
+        loadingMessageView.setText(initialMessage);
+
+        loadingDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        loadingDialog.show();
     }
 
     private void login(String username, String pswrd){
+        showLoadingDialog("Connecting to server...");
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
+            updateLoadingMessage("Authenticating user...");
             User connectionUser = User.login("aa","a");
+            updateLoadingMessage("Finalizing...");
             runOnUiThread(() -> {
+                dismissLoadingDialog();
                 if (connectionUser == null) {
                     Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
                 } else {

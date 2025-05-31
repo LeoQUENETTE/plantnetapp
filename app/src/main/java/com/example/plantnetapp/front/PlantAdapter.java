@@ -1,5 +1,6 @@
 package com.example.plantnetapp.front;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,6 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
         Plant p = filteredList.get(pos);
         holder.tvName.setText(p.name);
         holder.tvDesc.setText("");
-        // Glide.with(holder.iv.getContext()).load(p.getImageUrl()).into(holder.iv);
         holder.itemView.setOnClickListener(v -> listener.onClick(p));
     }
 
@@ -83,10 +83,23 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
                 fr.values = result;
                 return fr;
             }
+            @SuppressLint("NotifyDataSetChanged")
             @Override protected void publishResults(CharSequence constraint, FilterResults results) {
                 filteredList = (List<Plant>) results.values;
                 notifyDataSetChanged();
             }
         };
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    public void setPlants(List<Plant> newPlants) {
+        if (newPlants == null){
+            fullList = new ArrayList<>();
+            filteredList = new ArrayList<>();
+            notifyDataSetChanged();
+            return;
+        }
+        fullList = newPlants;
+        filteredList = newPlants;
+        notifyDataSetChanged();
     }
 }

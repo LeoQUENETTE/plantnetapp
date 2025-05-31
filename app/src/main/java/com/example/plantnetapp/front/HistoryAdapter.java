@@ -25,7 +25,7 @@ public class HistoryAdapter
         void onItemClick(Plant entry);
     }
 
-    private final List<Plant> fullList;
+    private List<Plant> fullList;
     private List<Plant> filteredList;
     private final OnHistoryClickListener listener;
 
@@ -90,5 +90,17 @@ public class HistoryAdapter
                 notifyDataSetChanged();
             }
         };
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    public void setPlants(List<Plant> newPlants) {
+        if (newPlants == null){
+            fullList = new ArrayList<>();
+            filteredList = new ArrayList<>();
+            notifyDataSetChanged();
+            return;
+        }
+        fullList = newPlants;
+        filteredList = newPlants;
+        notifyDataSetChanged();
     }
 }

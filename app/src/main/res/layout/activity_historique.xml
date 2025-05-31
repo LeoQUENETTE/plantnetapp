@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,63 +12,96 @@
         android:src="@drawable/bg_list"
         android:scaleType="centerCrop" />
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
-
-    <!-- 1) Bouton Retour -->
-    <ImageButton
-        android:id="@+id/btnBackHistory"
-        android:layout_width="160dp"
-        android:layout_height="60dp"
-        android:contentDescription="Retour"
-        android:background="?attr/selectableItemBackgroundBorderless"/>
-
-    <!-- 2) Barre de recherche qui filtre BOTH -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/svGlobal"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Rechercher…"
-        android:text="Rechercher une plante…"
-        android:iconifiedByDefault="false"
-        android:background="#80000000"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:padding="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:weightSum="1"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/btnBackHistory"
+                android:layout_width="160dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:contentDescription="@string/goBack"
+                android:text="@string/goBack"
+                android:textSize="25sp"
+                android:backgroundTint="#5D6460"
+                tools:ignore="NestedWeights" />
 
-    <!-- 3) Historique complet (4 items visibles puis scroll) -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Historique complet"
-        android:textStyle="bold"
-        android:textSize="25sp"
-        android:layout_marginBottom="4dp"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvHistoryAll"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:overScrollMode="never"
-        android:nestedScrollingEnabled="true"
-        android:layout_marginBottom="24dp"/>
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/svGlobal"
 
-    <!-- 4) Mes collections (scroll independent) -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mes collections"
-        android:textStyle="bold"
-        android:textSize="25sp"
-        android:layout_marginBottom="4dp"/>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCollections"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:nestedScrollingEnabled="true"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:queryHint="Rechercher…"
+                android:text="@string/search_view_historique"
+                android:iconifiedByDefault="false"
+                android:background="#80000000"/>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="0.1"
+                android:text="@string/full_historique"
+                android:textStyle="bold"
+                android:textSize="25sp"
+                android:layout_marginBottom="4dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHistoryAll"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:overScrollMode="never"
+                android:nestedScrollingEnabled="true"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.1"
+                android:weightSum="1"
+                android:orientation="horizontal"
+                tools:ignore="NestedWeights">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="0.5"
+                    android:layout_height="wrap_content"
+                    android:text="@string/collectionsText"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="4dp"/>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"/>
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.2"
+                    android:textColor="#FFFF"
+                    android:textSize="15sp"
+                    android:backgroundTint="#D33B2F"
+                    android:text="@string/delete"/>
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCollections"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:nestedScrollingEnabled="true"/>
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
