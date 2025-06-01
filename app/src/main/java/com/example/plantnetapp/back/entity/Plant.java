@@ -4,17 +4,14 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
-import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.api.ExternalBDDApi;
 import com.example.plantnetapp.back.api.PlantNetAPI;
 import com.example.plantnetapp.back.api.ReturnType;
-import com.example.plantnetapp.front.CsvParser;
-import com.google.gson.JsonArray;
+import com.example.plantnetapp.back.CsvParser;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -61,6 +58,18 @@ public class Plant  extends Entity implements Serializable {
         this.waterFixing = waterFixing;
         this.imageData = imageData;
     }
+    public Plant(String name, String culturalCondition,float azoteFixing, float upgradeGrnd, float waterFixing, float azoteFixingR, float upgradeGrndR, float waterFixingR,byte[] imageData) {
+        this.name = name;
+        this.culturalCondition = culturalCondition;
+        this.azoteFixing = azoteFixing;
+        this.upgradeGrnd = upgradeGrnd;
+        this.waterFixing = waterFixing;
+        this.azoteReliability = azoteFixingR;
+        this.upgradeReliability = upgradeGrndR;
+        this.waterReliability = waterFixingR;
+        this.imageData = imageData;
+
+    }
 
     @Override
     public boolean equalsWithoutId(Object o) {
@@ -73,9 +82,13 @@ public class Plant  extends Entity implements Serializable {
             plantObject = object.getAsJsonObject("plant");
         }
         String name = plantObject.get("name").getAsString();
+        String cultural_condition = plantObject.get("cultural_condition").getAsString();
         float azote_fixation = plantObject.get("azote_fixation").getAsFloat();
         float upgrade_ground = plantObject.get("upgrade_ground").getAsFloat();
         float water_fixation = plantObject.get("water_fixation").getAsFloat();
+        float azote_fixation_r = plantObject.get("azote_fixation_r").getAsFloat();
+        float upgrade_ground_r = plantObject.get("upgrade_ground_r").getAsFloat();
+        float water_fixation_r = plantObject.get("water_fixation_r").getAsFloat();
         String image_data = plantObject.get("image_data").getAsString();
 
 
@@ -83,28 +96,17 @@ public class Plant  extends Entity implements Serializable {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             imageBytes = Base64.getDecoder().decode(image_data);
         }
-        return new Plant(name,azote_fixation,upgrade_ground,water_fixation, imageBytes);
+        return new Plant(name,cultural_condition,azote_fixation,upgrade_ground,water_fixation,azote_fixation_r,upgrade_ground_r,water_fixation_r,imageBytes);
     }
-    public static Plant addPlant(File image,PlantCollection collection,Context context){
+    public static void addPlant(Plant plant, File image, PlantCollection collection, Context context){
         ExternalBDDApi bdd = ExternalBDDApi.createInstance();
-        PlantNetAPI api = PlantNetAPI.createInstance();
         try{
-            ReturnType apiResponse = api.identify(image,null,null,null,1,null,null,null);
-            JsonObject mostPossiblePlant = apiResponse.values.getAsJsonArray("results").get(0).getAsJsonObject();
-            String plantName = mostPossiblePlant.getAsJsonObject("species").get("scientificNameWithoutAuthor").getAsString();
-            Map<String, Plant> plants = CsvParser.createInstance(context);
-            if (plants == null){
-                return null;
-            }
-            Plant plant = plants.get(plantName);
             if (plant == null){
-                return null;
+                return;
             }
             bdd.addPlant(collection.id, plant, image);
-            return plant;
         }
-        catch (Exception e) {
-            return null;
+        catch (Exception ignored) {
         }
     }
     public static Plant addPlantNoCollection(File image, User currentUser, Context context){
@@ -168,7 +170,7 @@ public class Plant  extends Entity implements Serializable {
         try{
             ReturnType response = bdd.getPlant(collectionID, plantName);
             return Plant.plantFromJSON(response.values, true);
-        }catch (IOException e){
+        }catch (Exception e){
             return null;
         }
     }

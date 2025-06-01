@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.adapter;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -6,9 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
@@ -17,53 +17,53 @@ import com.example.plantnetapp.back.entity.Plant;
 import java.util.ArrayList;
 import java.util.List;
 
+public class HistoryAdapter
+        extends RecyclerView.Adapter<HistoryAdapter.VH>
+        implements Filterable {
 
-public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implements Filterable {
-    private List<Plant> fullList;
-    private List<Plant> filteredList;
-    private OnPlantClickListener listener;
-
-    public PlantAdapter(List<Plant> plants, OnPlantClickListener listener) {
-        this.fullList = new ArrayList<>(plants);
-        this.filteredList = plants;
-        this.listener = listener;
+    public interface OnHistoryClickListener {
+        void onItemClick(Plant entry);
     }
 
-    @Override public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+    private List<Plant> fullList;
+    private List<Plant> filteredList;
+    private final OnHistoryClickListener listener;
+
+    // ← On ajoute bien le listener ici
+    public HistoryAdapter(List<Plant> list, OnHistoryClickListener listener) {
+        this.fullList     = new ArrayList<>(list);
+        this.filteredList = new ArrayList<>(list);
+        this.listener     = listener;
+    }
+
+    @NonNull @Override
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_plant, parent,false);
+                .inflate(R.layout.item_history_entry, parent, false);
         return new VH(v);
     }
 
-    @Override public void onBindViewHolder(VH holder, int pos) {
-        Plant p = filteredList.get(pos);
-        holder.tvName.setText(p.name);
-        holder.tvDesc.setText("");
-        holder.itemView.setOnClickListener(v -> listener.onClick(p));
+    @Override
+    public void onBindViewHolder(@NonNull VH holder, int pos) {
+        Plant e = filteredList.get(pos);
+        holder.tvName.setText(e.name);
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(e));
     }
 
-    @Override public int getItemCount() {
+    @Override
+    public int getItemCount() {
         return filteredList.size();
     }
 
-    // VueHolder
     static class VH extends RecyclerView.ViewHolder {
-        ImageView iv;
-        TextView tvName, tvDesc;
+        TextView tvName, tvDate;
         VH(View itemView) {
             super(itemView);
-            iv      = itemView.findViewById(R.id.ivPlante);
-            tvName  = itemView.findViewById(R.id.tvNomPlante);
-            tvDesc  = itemView.findViewById(R.id.tvDescPlante);
+            tvName = itemView.findViewById(R.id.tvHistoryName);
+            tvDate = itemView.findViewById(R.id.tvHistoryDate);
         }
     }
 
-    // Interface pour le clic
-    public interface OnPlantClickListener {
-        void onClick(Plant uselessPlant);
-    }
-
-    // ----- Filterable -----
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -71,11 +71,11 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
                 String query = constraint == null ? "" : constraint.toString().toLowerCase().trim();
                 List<Plant> result = new ArrayList<>();
                 if (query.isEmpty()) {
-                    result = fullList;
+                    result.addAll(fullList);
                 } else {
-                    for (Plant p : fullList) {
-                        if (p.name.toLowerCase().contains(query)) {
-                            result.add(p);
+                    for (Plant e : fullList) {
+                        if (e.name.toLowerCase().contains(query)) {
+                            result.add(e);
                         }
                     }
                 }
@@ -85,6 +85,7 @@ public class PlantAdapter extends RecyclerView.Adapter<PlantAdapter.VH> implemen
             }
             @SuppressLint("NotifyDataSetChanged")
             @Override protected void publishResults(CharSequence constraint, FilterResults results) {
+                //noinspection unchecked
                 filteredList = (List<Plant>) results.values;
                 notifyDataSetChanged();
             }

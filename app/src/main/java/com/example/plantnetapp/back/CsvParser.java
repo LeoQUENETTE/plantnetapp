@@ -1,9 +1,8 @@
 // app/src/main/java/com/example/plantnetapp/front/CsvParser.java
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.back;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
 import android.util.Log;
 
 import com.example.plantnetapp.R;
@@ -13,11 +12,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class CsvParser {
     /**ligne : service;species;value;reliability;cultural_condition

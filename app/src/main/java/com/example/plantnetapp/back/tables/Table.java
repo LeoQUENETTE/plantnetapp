@@ -2,6 +2,7 @@ package com.example.plantnetapp.back.tables;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.plantnetapp.back.entity.Entity;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 public abstract class Table {
     protected static SQLiteDatabase database = null;
-    public static String TABLE_NAME;
+    public String TABLE_NAME;
     public void setDatabase(SQLiteDatabase db){
         database = db;
     }
@@ -21,8 +22,8 @@ public abstract class Table {
         String query = "DELETE FROM "+tableName;
         database.execSQL(query);
     }
-    public static void dropTable(String tableName){
-        String query = "DROP TABLE IF EXISTS "+tableName;
+    public static void dropTable(Table table){
+        String query = "DROP TABLE IF EXISTS "+ table.TABLE_NAME;
         database.execSQL(query);
     }
     public abstract void addData(Entity entity) throws Exception;
@@ -36,5 +37,20 @@ public abstract class Table {
         cursor.close();
         return value;
     }
+    public String getTableName(){
+        return this.TABLE_NAME;
+    }
     public abstract void updateData();
+    public boolean tableExist(){
+        if (database == null || !database.isOpen()) {
+            return false;
+        }
+        String query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?";
+        try (Cursor cursor = database.rawQuery(query, new String[]{TABLE_NAME})) {
+            return cursor.moveToFirst();
+        } catch(Exception e) {
+            Log.e("DBHelper", "Error checking table existence", e);
+            return false;
+        }
+    }
 }

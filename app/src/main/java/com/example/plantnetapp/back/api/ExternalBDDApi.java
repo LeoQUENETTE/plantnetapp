@@ -1,7 +1,5 @@
 package com.example.plantnetapp.back.api;
 
-import android.os.Build;
-
 import androidx.annotation.Nullable;
 
 import java.io.BufferedOutputStream;
@@ -12,26 +10,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.User;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 public class ExternalBDDApi {
     private static ExternalBDDApi INSTANCE = null;
@@ -59,7 +47,17 @@ public class ExternalBDDApi {
              FileInputStream fileInputStream = new FileInputStream(file)) {
 
             // Écriture des champs texte
-            String[] fields = {"plantCollectionID", "name", "azote_fixation", "upgrade_ground", "water_fixation"};
+            String[] fields = {
+                    "plantCollectionID",
+                    "name",
+                    "cultural_condition",
+                    "azote_fixation",
+                    "upgrade_ground",
+                    "water_fixation",
+                    "azote_fixation_r",
+                    "upgrade_ground_r",
+                    "water_fixation_r"
+            };
             for (String field : fields) {
                 String part = "--" + boundary + "\r\n" +
                         "Content-Disposition: form-data; name=\"" + field + "\"\r\n\r\n" +
@@ -364,9 +362,13 @@ public class ExternalBDDApi {
             JsonObject body = new JsonObject();
             body.addProperty("plantCollectionID", collectionID);
             body.addProperty("name", plant.name);
+            body.addProperty("cultural_condition", plant.culturalCondition);
             body.addProperty("azote_fixation", plant.azoteFixing);
             body.addProperty("upgrade_ground", plant.upgradeGrnd);
             body.addProperty("water_fixation", plant.waterFixing);
+            body.addProperty("azote_fixation_r", plant.azoteReliability);
+            body.addProperty("upgrade_ground_r", plant.upgradeReliability);
+            body.addProperty("water_fixation_r", plant.waterReliability);
 
             System.out.println(imageFile.isFile());
             if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
@@ -410,11 +412,15 @@ public class ExternalBDDApi {
 
         body.addProperty("plantCollectionID", collectionID);
         body.addProperty("name", plant.name);
-        addNumberWithoutDecimal(body, "azote_fixation", plant.azoteFixing);
-        addNumberWithoutDecimal(body, "upgrade_ground", plant.upgradeGrnd);
-        addNumberWithoutDecimal(body, "water_fixation", plant.waterFixing);
+        body.addProperty("cultural_condition", plant.culturalCondition);
+        body.addProperty("azote_fixation", plant.azoteFixing);
+        body.addProperty("upgrade_ground", plant.upgradeGrnd);
+        body.addProperty("water_fixation", plant.waterFixing);
+        body.addProperty("azote_fixation_r", plant.azoteReliability);
+        body.addProperty("upgrade_ground_r", plant.upgradeReliability);
+        body.addProperty("water_fixation_r", plant.waterReliability);
 
-        System.out.println(imageFile.isFile());
+
         if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
             throw new IOException("Image file is invalid or not found: " + imageFile.getAbsolutePath());
         }
@@ -437,7 +443,6 @@ public class ExternalBDDApi {
         if (response.status != 200){
             throw  new IOException(response.values.toString());
         }
-        System.out.println(response);
         return response;
     }
     public ReturnType getAllPlants(String collectionID) throws IOException{

@@ -37,4 +37,7 @@
     <string name="collectionsText">Mes collections</string>
     <string name="full_historique">Historique complet</string>
     <string name="search_view_historique">Rechercher une plante…</string>
+    <string name="valueText">- Valeur :</string>
+    <string name="reliabitityText">- Fiabilité :</string>
+    <string name="culturalCondition">- Condition :</string>
 </resources>

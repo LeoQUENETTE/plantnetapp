@@ -3,7 +3,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".front.PhotoActivity">
+    tools:context=".front.activity.PhotoActivity">
 
     <!-- PreviewView de CameraX pour afficher le flux caméra -->
     <androidx.camera.view.PreviewView

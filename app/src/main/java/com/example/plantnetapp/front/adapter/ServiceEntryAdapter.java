@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.front.entry.ServiceEntry;
 
 import java.util.List;
 

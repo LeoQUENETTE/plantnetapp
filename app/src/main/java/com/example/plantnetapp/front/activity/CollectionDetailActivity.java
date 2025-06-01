@@ -1,6 +1,5 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.front.adapter.PlantAdapter;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

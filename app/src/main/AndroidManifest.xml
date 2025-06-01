@@ -6,6 +6,8 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -19,7 +21,7 @@
 
         <!-- Launcher : LoginActivity -->
         <activity
-            android:name=".front.LoginActivity"
+            android:name=".front.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -27,14 +29,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".front.RegisterActivity"    android:exported="false"/>
-        <activity android:name=".front.MainActivity"        android:exported="false"/>
-        <activity android:name=".front.PhotoActivity"       android:exported="false"/>
-        <activity android:name=".front.HistoriqueActivity"  android:exported="false"/>
-        <activity android:name=".front.PlantsListActivity"  android:exported="false"/>
-        <activity android:name=".front.DetailActivity"      android:exported="false"/>
-        <activity android:name=".front.CollectionDetailActivity" android:exported="false"/>
-        <activity android:name=".front.ResultActivity" android:exported="false"/>
+        <activity android:name=".front.activity.RegisterActivity"    android:exported="false"/>
+        <activity android:name=".front.activity.MainActivity"        android:exported="false"/>
+        <activity android:name=".front.activity.PhotoActivity"       android:exported="false"/>
+        <activity android:name=".front.activity.HistoriqueActivity"  android:exported="false"/>
+        <activity android:name=".front.activity.PlantsListActivity"  android:exported="false"/>
+        <activity android:name=".front.activity.DetailActivity"      android:exported="false"/>
+        <activity android:name=".front.activity.CollectionDetailActivity" android:exported="false"/>
+        <activity android:name=".front.activity.ResultActivity" android:exported="false"/>
 
 
     </application>

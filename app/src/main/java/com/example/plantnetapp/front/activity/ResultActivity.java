@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

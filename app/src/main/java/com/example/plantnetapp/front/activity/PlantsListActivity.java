@@ -1,12 +1,8 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.RenderEffect;
-import android.graphics.Shader;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -17,11 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.CsvParser;
+import com.example.plantnetapp.front.adapter.PlantAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PlantsListActivity extends AppCompatActivity {
     private PlantAdapter adapter;

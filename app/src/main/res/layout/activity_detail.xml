@@ -11,21 +11,21 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+        <!-- Fond d'écran-->
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/bg_info"
             android:scaleType="centerCrop" />
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <!-- Haut de page -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.2"
+                android:layout_weight="0.15"
                 android:orientation="vertical">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -49,19 +49,21 @@
                     <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_weight="0.2"/>
+                        android:layout_weight="0.6"/>
 
                     <ImageButton
                         android:id="@+id/btnDrawer"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/gear_icon"
-                        android:background="#AEFFFFFF"
+                        android:src="@drawable/hamburger"
+                        android:scaleType="centerCrop"
+                        android:background="#00FFFFFF"
                         android:layout_gravity="center_vertical"
                         android:layout_marginEnd="20dp"
                         android:contentDescription="@string/menu"/>
                 </LinearLayout>
             </LinearLayout>
+            <!-- Bas de page -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -85,13 +87,22 @@
                         android:textAlignment="center"
                         android:background="#AEFFFFFF"
                         android:layout_marginBottom="8dp"/>
+                    <ImageView
+                        android:id="@+id/plantImage"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.4"
+                        android:layout_marginBottom="8dp"
+                        android:scaleType="centerCrop" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvServices"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="0.8"
+                        android:layout_weight="0.4"
                         android:nestedScrollingEnabled="false"/>
+
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

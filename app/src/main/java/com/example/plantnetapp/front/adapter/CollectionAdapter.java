@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.adapter;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -16,7 +16,6 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.PlantCollection;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

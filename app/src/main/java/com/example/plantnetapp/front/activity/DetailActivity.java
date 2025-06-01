@@ -1,11 +1,13 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
-import android.media.Image;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,8 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.front.entry.ServiceEntry;
+import com.example.plantnetapp.front.adapter.ServiceEntryAdapter;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     private String plantName;
     private User user;
     private PlantCollection collection;
+    private Plant plant;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +59,14 @@ public class DetailActivity extends AppCompatActivity {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
                 foundCollection.set(PlantCollection.getHistory(user.id));
-                Plant plant = Plant.getPlant(foundCollection.get().id, plantName);
+                plant = Plant.getPlant(foundCollection.get().id, plantName);
+                if (plant == null){
+                    return;
+                }
                 runOnUiThread(() -> {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(plant.imageData, 0, plant.imageData.length);
+                    ImageView imageView = findViewById(R.id.plantImage);
+                    imageView.setImageBitmap(bitmap);
                     createService(plant);
                 });
                 collection = foundCollection.get();
@@ -140,33 +151,10 @@ public class DetailActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void deletePlant(){
-        Plant.deletePlant(collection.id,plantName);
-    }
-    private void goBackAfterDeletion(){
-        runOnUiThread(() -> {
-            Intent newIntent = new Intent();
-            newIntent.putExtra("updateCollection", true);
-            setResult(RESULT_OK, newIntent);
-            finish();
-        });
-    }
-
     private void callTelaBotanica(String specie){
         String url = "https://www.tela-botanica.org/?s=" + specie;
         Intent web = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(web);
-    }
-
-
-    private void createSingleThread(Runnable before, Runnable func, Runnable onFinish){
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
-            before.run();
-            func.run();
-            onFinish.run();
-        });
-        executor.shutdown();
     }
     private void createService(Plant plant){
         if (plant != null){

@@ -1,6 +1,8 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,7 +15,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.DBHelper;
+import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.CsvParser;
+import com.example.plantnetapp.back.tables.PlantTable;
+import com.example.plantnetapp.back.tables.UserTable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +29,10 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private TextView loadingMessageView;
     private AlertDialog loadingDialog;
+
+    private DBHelper db;
+    private UserTable userTable;
+    private boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +44,16 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         CsvParser.createInstance(this);
+        db = DBHelper.getInstance(this,null);
+        userTable = UserTable.getInstance();
+        if(!userTable.tableExist()){
+            db.initializeTables();
+        };
+        db.dropTables();
+//        db.initializeTables();
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
 
         setContentView(R.layout.activity_login);
 
@@ -46,7 +67,16 @@ public class LoginActivity extends AppCompatActivity {
 
         Button btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(v -> {
-            login(username.getText().toString(), pswrd.getText().toString());
+            if (isConnected){
+                login(username.getText().toString(), pswrd.getText().toString());
+            }else{
+                try {
+                    userTable.login(username.getText().toString(), pswrd.getText().toString());
+                } catch (Exception e) {
+                    return;
+                }
+            }
+
         });
     }
     @Override

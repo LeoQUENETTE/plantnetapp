@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:textColor="@android:color/white"
+        android:textColor="#728579"
         android:layout_marginBottom="8dp"/>
 
     <!-- Détails indentés -->
@@ -24,22 +24,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:textColor="#728579"
         android:paddingStart="16dp"
-        android:text="- Valeur : "/>
+        android:text="@string/valueText"/>
 
     <TextView
         android:id="@+id/tvReliability"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:textColor="#728579"
         android:paddingStart="16dp"
-        android:text="- Fiabilité : "/>
+        android:text="@string/reliabitityText"/>
 
     <TextView
         android:id="@+id/tvCultural"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:textColor="#728579"
         android:paddingStart="16dp"
-        android:text="- Condition : "/>
+        android:text="@string/culturalCondition" />
 </LinearLayout>

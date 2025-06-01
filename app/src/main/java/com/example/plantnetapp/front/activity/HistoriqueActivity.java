@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,9 +18,10 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.front.adapter.CollectionAdapter;
+import com.example.plantnetapp.front.adapter.HistoryAdapter;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

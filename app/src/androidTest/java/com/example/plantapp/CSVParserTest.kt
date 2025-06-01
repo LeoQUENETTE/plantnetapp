@@ -3,7 +3,7 @@ package com.example.plantapp
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.example.plantnetapp.R
-import com.example.plantnetapp.front.CsvParser
+import com.example.plantnetapp.back.CsvParser
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test

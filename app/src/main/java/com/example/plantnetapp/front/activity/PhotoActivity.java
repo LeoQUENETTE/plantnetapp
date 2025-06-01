@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,17 +32,24 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.DBHelper;
+import com.example.plantnetapp.back.api.PlantNetAPI;
+import com.example.plantnetapp.back.api.ReturnType;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.tables.PlantTable;
+import com.example.plantnetapp.front.adapter.CollectionAdapterCheckbox;
+import com.example.plantnetapp.back.CsvParser;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -63,6 +72,9 @@ public class PhotoActivity extends AppCompatActivity {
     private List<String> collectionName;
     private File outputFile;
     private Plant plant;
+    private PlantTable plantTable;
+    private DBHelper db;
+    private boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +87,15 @@ public class PhotoActivity extends AppCompatActivity {
             return;
         }
         user = foundUser;
+        db = DBHelper.getInstance(PhotoActivity.this,null);
+        plantTable = PlantTable.getInstance();
+        if(plantTable.tableExist()){
+            db.initializeTables();
+        };
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
@@ -90,6 +111,8 @@ public class PhotoActivity extends AppCompatActivity {
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
+
+
 
         btnCapture.setOnClickListener(v -> takePhoto());
     }
@@ -314,8 +337,22 @@ public class PhotoActivity extends AppCompatActivity {
         for (int index : selected) {
             executor.submit(() -> {
                 String name = collectionName.get(index);
-                PlantCollection collection = PlantCollection.getCollection(user.id,name);
-                Plant.addPlant(outputFile,collection, PhotoActivity.this);
+                if (isConnected){
+                    PlantCollection collection = PlantCollection.getCollection(user.id,name);
+                    PlantNetAPI api = PlantNetAPI.createInstance();
+                    ReturnType apiResponse = null;
+                    try {
+                        apiResponse = api.identify(outputFile,null,null,null,1,null,null,null);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    JsonObject mostPossiblePlant = apiResponse.values.getAsJsonArray("results").get(0).getAsJsonObject();
+                    String plantName = mostPossiblePlant.getAsJsonObject("species").get("scientificNameWithoutAuthor").getAsString();
+                    Map<String, Plant> plants = CsvParser.createInstance(PhotoActivity.this);
+                    Plant plant = plants.get(plantName);
+                    plantTable.addData(plant);
+                    Plant.addPlant(plant,outputFile,collection, PhotoActivity.this);
+                }
             });
         }
         showPlant(plant);

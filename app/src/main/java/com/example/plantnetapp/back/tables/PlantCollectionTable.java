@@ -8,16 +8,16 @@ import java.util.List;
 
 public class PlantCollectionTable extends Table{
     private static PlantCollectionTable INSTANCE = null;
-    public static final String TABLE_NAME = "PlantCollection";
-    private PlantCollectionTable(SQLiteDatabase db, boolean tableExist) {
+    private PlantCollectionTable(SQLiteDatabase db) {
+        TABLE_NAME = "PlantCollection";
         database = db;
-        if (!tableExist){
+        if (!tableExist()){
             createTable();
         }
     }
-    public static void createInstance(SQLiteDatabase db,  boolean tableExist){
+    public static void createInstance(SQLiteDatabase db){
         if (INSTANCE == null){
-            INSTANCE = new PlantCollectionTable(db, tableExist);
+            INSTANCE = new PlantCollectionTable(db);
         }
     }
 
@@ -27,7 +27,12 @@ public class PlantCollectionTable extends Table{
 
     @Override
     public void createTable() {
-
+        String query = "CREATE TABLE IF NOT EXISTS "+TABLE_NAME+"(" +
+                "id TEXT PRIMARY KEY," +
+                "userID TEXT NOT NULL," +
+                "collectionName TEXT NOT NULL," +
+                "FOREIGN KEY (userID) REFERENCES users(id));";
+        database.execSQL(query);
     }
 
     @Override

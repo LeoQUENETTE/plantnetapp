@@ -12,16 +12,16 @@ import java.util.Objects;
 
 public class UserTable extends Table{
     private static UserTable INSTANCE = null;
-    public static final String TABLE_NAME = "User";
-    private UserTable(SQLiteDatabase db,  boolean tableExist) {
+    private UserTable(SQLiteDatabase db) {
+       TABLE_NAME = "User";
         database = db;
-        if (!tableExist){
+        if (!tableExist()){
             createTable();
         }
     }
-    public static void createInstance(SQLiteDatabase db, boolean tableExist){
+    public static void createInstance(SQLiteDatabase db){
         if (INSTANCE == null){
-            INSTANCE = new UserTable(db, tableExist);
+            INSTANCE = new UserTable(db);
         }
     }
 
@@ -40,14 +40,12 @@ public class UserTable extends Table{
                 +"mdp TEXT NOT NULL,"
                 +"firstName TEXT,"
                 +"lastName TEXT,"
-                +"role TEXT NOT NULL,"
                 +"mail TEXT,"
-                +"phone TEXT"
-                +")";
+                +"phone TEXT);";
         database.execSQL(query);
     }
 
-    public static User login(String login, String mdp) throws Exception {
+    public User login(String login, String mdp) throws Exception {
         String query = "SELECT * FROM "+TABLE_NAME+" WHERE login=? AND mdp=?";
         String[] bindArgs = {login, mdp};
         Cursor cursor = database.rawQuery(query, bindArgs);

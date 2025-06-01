@@ -1,4 +1,4 @@
-package com.example.plantnetapp.front;
+package com.example.plantnetapp.front.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

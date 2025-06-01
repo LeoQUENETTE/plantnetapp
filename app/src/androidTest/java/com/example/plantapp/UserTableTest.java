@@ -31,11 +31,11 @@ public class UserTableTest {
         Context context = ApplicationProvider.getApplicationContext();
         db = DBHelper.getInstance(context, null);
         userTable = UserTable.getInstance();
-        Table.deleteTable(UserTable.TABLE_NAME);
+        Table.deleteTable(userTable.TABLE_NAME);
     }
     @After
     public void reset(){
-        Table.dropTable(UserTable.TABLE_NAME);
+        Table.dropTable(UserTable.getInstance());
         UserTable.destroyInstance();
         DBHelper.destroyInstance();
     }
@@ -43,7 +43,7 @@ public class UserTableTest {
 
     @Test
     public void created(){
-        assertTrue(db.tableExist(UserTable.TABLE_NAME));
+        assertTrue(userTable.tableExist());
     }
 
 
@@ -51,7 +51,7 @@ public class UserTableTest {
     public void addDataNoIDTest() throws Exception {
         User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
-        assertEquals(1, Table.getTotalNbRows(UserTable.TABLE_NAME));
+        assertEquals(1, Table.getTotalNbRows(userTable.TABLE_NAME));
         User newUser = (User) userTable.selectData("1");
         assertTrue("Comparaison sans les identifiants", newUser.equalsWithoutId(user));
     }
@@ -59,7 +59,7 @@ public class UserTableTest {
     public void addDataTest() throws Exception {
         User user = new User("1","azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
-        assertEquals(1, Table.getTotalNbRows(UserTable.TABLE_NAME));
+        assertEquals(1, Table.getTotalNbRows(userTable.TABLE_NAME));
         User newUser = (User) userTable.selectData("1");
         assertTrue("Comparaison sans les identifiants", newUser.equalsWithoutId(user));
     }
@@ -69,7 +69,7 @@ public class UserTableTest {
         User user = new User("azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         userTable.deleteData(user);
-        assertEquals(0, Table.getTotalNbRows(UserTable.TABLE_NAME));
+        assertEquals(0, Table.getTotalNbRows(userTable.TABLE_NAME));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UserTableTest {
         User user = new User("1","azerty","123456","Léo","Quenette", "leoettag@gmail.com","0766190489");
         userTable.addData(user);
         userTable.deleteData(user);
-        assertEquals(0, Table.getTotalNbRows(UserTable.TABLE_NAME));
+        assertEquals(0, Table.getTotalNbRows(userTable.TABLE_NAME));
     }
 
     @Test
