@@ -47,7 +47,6 @@ public class CsvParser {
                 String valueStr = cols[2].trim();
                 String reliabilityStr = cols[3].trim();
                 String culturalCondition = cols[4].trim();
-                // cols[3] and cols[4] available but unused in current logic
 
                 try {
                     float value = Float.parseFloat(valueStr);

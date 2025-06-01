@@ -98,7 +98,6 @@ public class DetailActivity extends AppCompatActivity {
                     imageView.setImageBitmap(bitmap);
                     createService(plant);
                 });
-                collection = foundCollection.get();
             });
         }
         else if(foundCollection.get() == null){
@@ -106,23 +105,28 @@ public class DetailActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-        }else{
+        }else if (fromList == null){
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
-                Plant plant2;
                 if (isConnected){
-                    plant2 = Plant.getPlant(foundCollection.get().id, plantName);
+                    plant = Plant.getPlant(foundCollection.get().id, plantName);
                 }else{
                     try {
-                        plant2 = (Plant) plantTable.selectData(foundCollection.get().id, plantName);
+                        plant = (Plant) plantTable.selectData(foundCollection.get().id, plantName);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
                 runOnUiThread(() -> {
-                    if(plant2 != null) {
-                        createService(plant2);
+                    if(plant != null) {
+                        createService(plant);
                     }
+                });
+                runOnUiThread(() -> {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(plant.imageData, 0, plant.imageData.length);
+                    ImageView imageView = findViewById(R.id.plantImage);
+                    imageView.setImageBitmap(bitmap);
+                    createService(plant);
                 });
             });
         }

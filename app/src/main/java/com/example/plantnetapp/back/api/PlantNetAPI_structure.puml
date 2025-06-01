@@ -1,0 +1,147 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": true,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": true,
+    "cutInterfaceStructures": true,
+    "cutDataStructures": true,
+    "cutGetterAndSetter": true,
+    "cutConstructors": true
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "com.example.plantnetapp.back.api.PlantNetAPI",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_1322970774 { 
+   	label=example
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1228495093 { 
+   	label=plantnetapp
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   ParameterStringBuilder2079699613[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)ParameterStringBuilder</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ addGetParameter(request: String, parameterName: String, value: String, isFirst: Boolean): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getParamsString(params: Map&lt;String, String&gt;): String</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+PlantNetAPI2079699613[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)PlantNetAPI</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   API_KEY: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   NB_IDENTIFICATION_MAX: int [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   URL_NAME: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ checkStatus(): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ createInstance(): PlantNetAPI</TD></TR>
+<TR><TD ALIGN="LEFT" >- createRequestGet(urlServiceName: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ dailyQuota(day: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >- getRequestResult(con: HttpURLConnection, requestType: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ historyQuota(year: int): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ identify(projectName: String, imagesUrl: String[]): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ identify(imageFile: File, projectName: String, includeRelatedImage: Boolean, noReject: Boolean, nbResults: int, lang: String, type: String, organs: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ languages(): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ linkImageToRequest(connection: HttpURLConnection, boundary: String, body: JsonObject, file: File, fileFieldName: String)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ projects(lang: String, lat: Float, lon: Float, type: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ sendPostRequest(endpoint: String, body: JsonObject, file: File): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ species(lang: String, type: String, pageSize: int, prefix: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ speciesByProject(projectName: String): ReturnType</TD></TR>
+<TR><TD ALIGN="LEFT" >+ subscription(): ReturnType</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+
+    
+}
+@enduml
