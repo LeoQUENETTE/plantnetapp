@@ -1,6 +1,9 @@
 package com.example.plantnetapp.front.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -16,12 +19,21 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.DBHelper;
+import com.example.plantnetapp.back.SyncDatabase;
+import com.example.plantnetapp.back.api.ExternalBDDApi;
+import com.example.plantnetapp.back.entity.Entity;
 import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
 import com.example.plantnetapp.back.CsvParser;
+import com.example.plantnetapp.back.tables.PlantCollectionTable;
 import com.example.plantnetapp.back.tables.PlantTable;
+import com.example.plantnetapp.back.tables.Table;
 import com.example.plantnetapp.back.tables.UserTable;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,13 +42,11 @@ public class LoginActivity extends AppCompatActivity {
     private TextView loadingMessageView;
     private AlertDialog loadingDialog;
 
-    private DBHelper db;
     private UserTable userTable;
     private boolean isConnected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, ">>> onCreate START");
 
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) {
@@ -44,17 +54,18 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         CsvParser.createInstance(this);
-        db = DBHelper.getInstance(this,null);
+        DBHelper db = DBHelper.getInstance(this, null);
         userTable = UserTable.getInstance();
         if(!userTable.tableExist()){
             db.initializeTables();
         };
-        db.dropTables();
-//        db.initializeTables();
         ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
-
+        if (isConnected){
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(SyncDatabase::syncIE);
+        }
         setContentView(R.layout.activity_login);
 
         EditText username = findViewById(R.id.etUsername);
@@ -79,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
 
         });
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -117,12 +129,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String username, String pswrd){
-        showLoadingDialog("Connecting to server...");
+        showLoadingDialog(getString(R.string.waitingConnServer));
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
-            updateLoadingMessage("Authenticating user...");
-            User connectionUser = User.login("aa","a");
-            updateLoadingMessage("Finalizing...");
+            updateLoadingMessage(getString(R.string.userAuth));
+            User connectionUser = User.login("b","b");
+            updateLoadingMessage(getString(R.string.finalizing));
             runOnUiThread(() -> {
                 dismissLoadingDialog();
                 if (connectionUser == null) {
@@ -135,5 +147,6 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
     }
+
 }
 

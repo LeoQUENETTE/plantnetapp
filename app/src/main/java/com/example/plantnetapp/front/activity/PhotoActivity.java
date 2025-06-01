@@ -38,6 +38,7 @@ import com.example.plantnetapp.back.api.ReturnType;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.tables.PlantCollectionTable;
 import com.example.plantnetapp.back.tables.PlantTable;
 import com.example.plantnetapp.front.adapter.CollectionAdapterCheckbox;
 import com.example.plantnetapp.back.CsvParser;
@@ -73,7 +74,7 @@ public class PhotoActivity extends AppCompatActivity {
     private File outputFile;
     private Plant plant;
     private PlantTable plantTable;
-    private DBHelper db;
+    private PlantCollectionTable collectionTable;
     private boolean isConnected;
 
     @Override
@@ -87,8 +88,9 @@ public class PhotoActivity extends AppCompatActivity {
             return;
         }
         user = foundUser;
-        db = DBHelper.getInstance(PhotoActivity.this,null);
+        DBHelper db = DBHelper.getInstance(PhotoActivity.this, null);
         plantTable = PlantTable.getInstance();
+        collectionTable = PlantCollectionTable.getInstance();
         if(plantTable.tableExist()){
             db.initializeTables();
         };
@@ -120,7 +122,7 @@ public class PhotoActivity extends AppCompatActivity {
     private void getCollectionNames(Runnable onfinish) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
-            List<PlantCollection> collection = PlantCollection.getAllPlantCollection(user.id);
+            List<PlantCollection> collection = PlantCollection.getCollectionsNoHistory(user.id);
             if (collection == null || collection.isEmpty()){
                 collectionName = new ArrayList<>();
             }else{
@@ -187,12 +189,19 @@ public class PhotoActivity extends AppCompatActivity {
                             updateLoadingMessage(getString(R.string.loadingAnalysePhoto));
                             plant = Plant.addPlantNoCollection(outputFile, // TODO change with actual photo, only for the test
                                     user, PhotoActivity.this);
+                            PlantCollection history = PlantCollection.getHistory(user.id);
+                            if (history != null){
+                                plant = Plant.getPlant(history.id, plant.name);
+                                if (plant != null){
+                                    plantTable.addData(plant);
+                                }
+                            }
                             runOnUiThread(() -> {
                                 dismissLoadingDialog();
                                 showAddToCollectionDialog();
                             });
-                            executor.shutdown();
                         });
+                        executor.shutdown();
 
 
                     }
@@ -317,15 +326,19 @@ public class PhotoActivity extends AppCompatActivity {
     private void addCollection(String collectionName){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
-            boolean result = PlantCollection.addCollection(user.id,collectionName);
-            if (result){
-                Toast.makeText(this, getString(R.string.addCollectionSuccess),Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this, getString(R.string.addCollectionFailed),Toast.LENGTH_SHORT).show();
+            String collectionID = null;
+            if (isConnected){
+                collectionID = PlantCollection.addCollection(user.id,collectionName);
+                if (collectionID != null){
+                    Toast.makeText(this, getString(R.string.addCollectionSuccess),Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(this, getString(R.string.addCollectionFailed),Toast.LENGTH_SHORT).show();
+                }
             }
-            executor.shutdown();
+            PlantCollection newCol = new PlantCollection(collectionID, user.id, collectionName, null);
+            collectionTable.addData(newCol);
         });
-
+        executor.shutdown();
     }
     private void addPlantInCollections(Set<Integer> selected){
         if (selected.isEmpty()){
@@ -350,8 +363,12 @@ public class PhotoActivity extends AppCompatActivity {
                     String plantName = mostPossiblePlant.getAsJsonObject("species").get("scientificNameWithoutAuthor").getAsString();
                     Map<String, Plant> plants = CsvParser.createInstance(PhotoActivity.this);
                     Plant plant = plants.get(plantName);
-                    plantTable.addData(plant);
-                    Plant.addPlant(plant,outputFile,collection, PhotoActivity.this);
+                    if (collection == null){
+                        return;
+                    }
+                    Plant.addPlant(plant,outputFile,collection);
+                    Plant newPlant= Plant.getPlant(collection.id,plantName);
+                    plantTable.addData(newPlant);
                 }
             });
         }

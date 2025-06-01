@@ -16,7 +16,7 @@ class ExternalBDDApiTest {
     private val     api : ExternalBDDApi = ExternalBDDApi.createInstance()
     private val testUser : User = User(null,"TestUser","2ee9edd7b02f41082bc33f0276bdedf1", "firstname","lastname","email", "phone")
     private val testCollection : PlantCollection = PlantCollection("testCollection",arrayListOf())
-    private val testPlant : Plant = Plant("rose", 0.5F, 0.75F, 0.6F, null)
+    private val testPlant : Plant = Plant("","rose", 0.5F, 0.75F, 0.6F)
     @Test
     fun apiConnectionTest() {
         try{

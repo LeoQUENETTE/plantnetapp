@@ -1,5 +1,6 @@
 package com.example.plantnetapp.front.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +29,13 @@ public class ServiceEntryAdapter
         return new VH(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override public void onBindViewHolder(@NonNull VH holder, int pos) {
         ServiceEntry e = entries.get(pos);
         holder.tvService   .setText(e.getService());
-        holder.tvValue     .setText("- Valeur : "     + e.getValue());
-        holder.tvReliability.setText("- Fiabilité : "   + e.getReliability() + "%");
-        holder.tvCultural  .setText("- Condition : "   + e.getCulturalCondition());
+        holder.tvValue     .setText(e.getValue());
+        holder.tvReliability.setText(e.getReliability() + "%");
+        holder.tvCultural  .setText(e.getCulturalCondition());
     }
 
     @Override public int getItemCount() { return entries.size(); }

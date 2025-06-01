@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import com.example.plantnetapp.back.entity.Plant;
+import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -278,6 +279,26 @@ public class ExternalBDDApi {
             throw new IOException(e.getMessage());
         }
     }
+    public ReturnType addUserWithID(User user) throws IOException {
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("id", user.id);
+            body.addProperty("username", user.login);
+            body.addProperty("pswrd", user.mdp);
+            body.addProperty("email",user.mail);
+            body.addProperty("firstname",user.firstName);
+            body.addProperty("lastname",user.lastName);
+            body.addProperty("phone",user.phone);
+            ReturnType response = sendPostRequest("user/addWithID",body, null);
+            if (response.status != 201){
+                throw new IOException(response.values.toString());
+            }
+            System.out.println(response);
+            return response;
+        }catch (IOException e){
+            throw new IOException(e.getMessage());
+        }
+    }
 
     public ReturnType deleteUser(String id) throws IOException{
         try {
@@ -285,6 +306,22 @@ public class ExternalBDDApi {
             body.addProperty("id", id);
             ReturnType response = sendDeleteRequest("user/delete",body);
             if (response.status != 200){
+                throw new IOException(response.values.toString());
+            }
+            System.out.println(response);
+            return response;
+        }catch (IOException e){
+            throw new IOException(e.getMessage());
+        }
+    }
+    public ReturnType addPlantCollectionWithID(String userID, PlantCollection col) throws IOException {
+        try {
+            JsonObject body = new JsonObject();
+            body.addProperty("id", col.id);
+            body.addProperty("userID", userID);
+            body.addProperty("name", col.name);
+            ReturnType response = sendPostRequest("user/addPlantCollectionWithID",body, null);
+            if (response.status != 201){
                 throw new IOException(response.values.toString());
             }
             System.out.println(response);
@@ -350,7 +387,6 @@ public class ExternalBDDApi {
             if (response.status != 200){
                 throw new IOException(response.values.toString());
             }
-            System.out.println(response);
             return response;
         }catch (IOException e){
             throw new IOException(e.getMessage());
@@ -369,8 +405,6 @@ public class ExternalBDDApi {
             body.addProperty("azote_fixation_r", plant.azoteReliability);
             body.addProperty("upgrade_ground_r", plant.upgradeReliability);
             body.addProperty("water_fixation_r", plant.waterReliability);
-
-            System.out.println(imageFile.isFile());
             if (!imageFile.exists() || !imageFile.isFile() || imageFile.length() == 0) {
                 throw new IOException("Image file is invalid or not found: " + imageFile.getAbsolutePath());
             }
@@ -382,7 +416,6 @@ public class ExternalBDDApi {
                 }
                 throw  new IOException(response.values.toString());
             }
-            System.out.println(response);
             return response;
         }catch (IOException e){
             return null;

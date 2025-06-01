@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -22,15 +23,16 @@ import java.util.Objects;
 public class Plant  extends Entity implements Serializable {
     public String id = "";
     public final String name;
-    public float azoteFixing = 0;
-    public float upgradeGrnd = 0;
-    public float waterFixing = 0;
-    public float azoteReliability = 0;
-    public float upgradeReliability = 0;
-    public float waterReliability = 0;
+    public final String collectionID;
+    public float azoteFixing;
+    public float upgradeGrnd;
+    public float waterFixing;
+    public float azoteReliability;
+    public float upgradeReliability;
+    public float waterReliability;
 
-    public String culturalCondition = "";
-    public byte[] imageData = null;
+    public String culturalCondition;
+    public byte[] imageData;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,19 +49,21 @@ public class Plant  extends Entity implements Serializable {
     public Plant(String id, String name, float azoteFixing, float upgradeGrnd, float waterFixing) {
         this.id = id;
         this.name = name;
+        this.collectionID = "";
         this.azoteFixing = azoteFixing;
         this.upgradeGrnd = upgradeGrnd;
         this.waterFixing = waterFixing;
+        this.azoteReliability = 0F;
+        this.upgradeReliability = 0F;
+        this.waterReliability = 0F;
+        this.culturalCondition = "";
+        this.imageData = null;
     }
-    public Plant(String name, float azoteFixing, float upgradeGrnd, float waterFixing, byte[] imageData) {
+    /** Add plant from external BDD to internal BDD**/
+    public Plant(String id, String name, String collectionID,String culturalCondition,float azoteFixing, float upgradeGrnd, float waterFixing, float azoteFixingR, float upgradeGrndR, float waterFixingR,byte[] imageData) {
+        this.id = id;
         this.name = name;
-        this.azoteFixing = azoteFixing;
-        this.upgradeGrnd = upgradeGrnd;
-        this.waterFixing = waterFixing;
-        this.imageData = imageData;
-    }
-    public Plant(String name, String culturalCondition,float azoteFixing, float upgradeGrnd, float waterFixing, float azoteFixingR, float upgradeGrndR, float waterFixingR,byte[] imageData) {
-        this.name = name;
+        this.collectionID = collectionID;
         this.culturalCondition = culturalCondition;
         this.azoteFixing = azoteFixing;
         this.upgradeGrnd = upgradeGrnd;
@@ -69,6 +73,18 @@ public class Plant  extends Entity implements Serializable {
         this.waterReliability = waterFixingR;
         this.imageData = imageData;
 
+    }
+    public Plant(String name, String collectionID,String culturalCondition,float azoteFixing, float upgradeGrnd, float waterFixing, float azoteFixingR, float upgradeGrndR, float waterFixingR,byte[] imageData) {
+        this.name = name;
+        this.collectionID = collectionID;
+        this.culturalCondition = culturalCondition;
+        this.azoteFixing = azoteFixing;
+        this.upgradeGrnd = upgradeGrnd;
+        this.waterFixing = waterFixing;
+        this.azoteReliability = azoteFixingR;
+        this.upgradeReliability = upgradeGrndR;
+        this.waterReliability = waterFixingR;
+        this.imageData = imageData;
     }
 
     @Override
@@ -81,6 +97,8 @@ public class Plant  extends Entity implements Serializable {
         if (indent){
             plantObject = object.getAsJsonObject("plant");
         }
+        String id = plantObject.get("id").getAsString();
+        String collectionID = plantObject.get("collectionID").getAsString();
         String name = plantObject.get("name").getAsString();
         String cultural_condition = plantObject.get("cultural_condition").getAsString();
         float azote_fixation = plantObject.get("azote_fixation").getAsFloat();
@@ -96,15 +114,31 @@ public class Plant  extends Entity implements Serializable {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             imageBytes = Base64.getDecoder().decode(image_data);
         }
-        return new Plant(name,cultural_condition,azote_fixation,upgrade_ground,water_fixation,azote_fixation_r,upgrade_ground_r,water_fixation_r,imageBytes);
+        return new Plant(id, name, collectionID,cultural_condition,azote_fixation,upgrade_ground,water_fixation,azote_fixation_r,upgrade_ground_r,water_fixation_r,imageBytes);
     }
-    public static void addPlant(Plant plant, File image, PlantCollection collection, Context context){
+    public static void addPlant(Plant plant, File image, PlantCollection collection){
         ExternalBDDApi bdd = ExternalBDDApi.createInstance();
         try{
             if (plant == null){
                 return;
             }
             bdd.addPlant(collection.id, plant, image);
+        }
+        catch (Exception ignored) {
+        }
+    }
+    public static void addPlant(Plant plant, PlantCollection collection){
+        ExternalBDDApi bdd = ExternalBDDApi.createInstance();
+        try{
+            if (plant == null){
+                return;
+            }
+            File imageFile = File.createTempFile("plant_image_", ".png");
+
+            try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+                fos.write(plant.imageData);
+            }
+            bdd.addPlant(collection.id, plant, imageFile);
         }
         catch (Exception ignored) {
         }

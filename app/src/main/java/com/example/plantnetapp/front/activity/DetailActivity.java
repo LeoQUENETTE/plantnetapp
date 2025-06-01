@@ -3,6 +3,8 @@ package com.example.plantnetapp.front.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -22,12 +24,14 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.tables.PlantTable;
 import com.example.plantnetapp.front.entry.ServiceEntry;
 import com.example.plantnetapp.front.adapter.ServiceEntryAdapter;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,6 +42,9 @@ public class DetailActivity extends AppCompatActivity {
     private User user;
     private PlantCollection collection;
     private Plant plant;
+    private PlantTable plantTable;
+    private boolean isConnected;
+    private boolean noCollection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,19 +54,41 @@ public class DetailActivity extends AppCompatActivity {
         String foundPlantName = (String) getIntent().getSerializableExtra("plantName");
         AtomicReference<PlantCollection> foundCollection = new AtomicReference<>((PlantCollection) getIntent().getSerializableExtra("collection"));
         Boolean noCollection = (Boolean) getIntent().getSerializableExtra("noCollection");
+        Boolean fromList = (Boolean) getIntent().getSerializableExtra("fromList");
         Boolean returnMain = (Boolean) getIntent().getSerializableExtra("returnMain");
         User foundUser  = (User) getIntent().getSerializableExtra("user");
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+
         if (foundPlantName == null || foundUser == null){
-            finish();
-            return;
+            if (fromList != null && fromList){
+                Plant plantList = (Plant) getIntent().getSerializableExtra("plant");
+                createService(plantList);
+            }else{
+                finish();
+                return;
+            }
+
         }
         plantName = foundPlantName;
         user = foundUser;
+        plantTable = PlantTable.getInstance();
         if (foundCollection.get() == null && noCollection != null && noCollection){
+            this.noCollection = true;
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
                 foundCollection.set(PlantCollection.getHistory(user.id));
-                plant = Plant.getPlant(foundCollection.get().id, plantName);
+                if (isConnected){
+                    plant = Plant.getPlant(foundCollection.get().id, plantName);
+                }else{
+                    try {
+                        plant = (Plant) plantTable.selectData(foundCollection.get().id, plantName);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
                 if (plant == null){
                     return;
                 }
@@ -73,14 +102,27 @@ public class DetailActivity extends AppCompatActivity {
             });
         }
         else if(foundCollection.get() == null){
-            finish();
-            return;
+            if (fromList == null || !fromList){
+                finish();
+                return;
+            }
         }else{
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
-                Plant plant = Plant.getPlant(foundCollection.get().id, plantName);
+                Plant plant2;
+                if (isConnected){
+                    plant2 = Plant.getPlant(foundCollection.get().id, plantName);
+                }else{
+                    try {
+                        plant2 = (Plant) plantTable.selectData(foundCollection.get().id, plantName);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 runOnUiThread(() -> {
-                    createService(plant);
+                    if(plant2 != null) {
+                        createService(plant2);
+                    }
                 });
             });
         }
@@ -109,7 +151,11 @@ public class DetailActivity extends AppCompatActivity {
             int moreInfoBtnId = R.id.nav_more_info;
             int deleteId = R.id.nav_delete;
             if (item.getItemId() == deleteId){
-                deletePlantWithConfirmation();
+                if (noCollection || Objects.equals(collection.name, "history")){
+                    Toast.makeText(this, getText(R.string.deletionImpossible).toString(), Toast.LENGTH_SHORT).show();
+                }else{
+                    deletePlantWithConfirmation();
+                }
                 return true;
             } else if (item.getItemId() == moreInfoBtnId) {
                 callTelaBotanica(plantName);
@@ -120,15 +166,20 @@ public class DetailActivity extends AppCompatActivity {
     }
     private void deletePlantWithConfirmation() {
         new AlertDialog.Builder(this)
-                .setTitle("Confirmer la suppression")
-                .setMessage("Voulez-vous vraiment supprimer cette plante ?")
+                .setTitle(getText(R.string.confirmDeletion).toString())
+                .setMessage(getText(R.string.sureDeletion).toString())
                 .setPositiveButton("Oui", (dialog, which) -> {
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     executor.execute(() -> {
                         try {
-                            boolean success = Plant.deletePlant(collection.id, plantName);
+                            boolean success;
+                            if (isConnected){
+                                success = Plant.deletePlant(collection.id, plantName);
+                            }
+                            success = plantTable.deletePlant(collection.id, plantName);
+                            boolean finalSuccess = success;
                             runOnUiThread(() -> {
-                                if (success) {
+                                if (finalSuccess) {
                                     Intent resultIntent = new Intent();
                                     resultIntent.putExtra("updateCollection", true);
                                     setResult(RESULT_OK, resultIntent);
@@ -139,7 +190,7 @@ public class DetailActivity extends AppCompatActivity {
                             });
                         } catch (Exception e) {
                             runOnUiThread(() -> {
-                                Toast.makeText(this, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, getText(R.string.deletionError).toString(), Toast.LENGTH_SHORT).show();
                                 setResult(RESULT_CANCELED);
                             });
                         } finally {
@@ -147,7 +198,7 @@ public class DetailActivity extends AppCompatActivity {
                         }
                     });
                 })
-                .setNegativeButton("Non", null)
+                .setNegativeButton(getText(R.string.no).toString(), null)
                 .show();
     }
 
@@ -162,9 +213,9 @@ public class DetailActivity extends AppCompatActivity {
             tvNom.setText(plant.name);
             List<ServiceEntry> services = new ArrayList<>();
             try {
-                addToService(services, "nitrogen provision", plant.azoteFixing,plant.azoteReliability, plant.culturalCondition);
-                addToService(services, "storage and return water", plant.waterFixing, plant.waterReliability, plant.culturalCondition);
-                addToService(services, "soil structuration", plant.upgradeGrnd, plant.upgradeReliability, plant.culturalCondition);
+                addToService(services, getText(R.string.nitrogen_provision).toString(), plant.azoteFixing,plant.azoteReliability, plant.culturalCondition);
+                addToService(services, getText(R.string.storage_gain_water).toString(), plant.waterFixing, plant.waterReliability, plant.culturalCondition);
+                addToService(services, getText(R.string.soil_structuration).toString(), plant.upgradeGrnd, plant.upgradeReliability, plant.culturalCondition);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -179,9 +230,9 @@ public class DetailActivity extends AppCompatActivity {
         if (value > 0){
             services.add(new ServiceEntry(
                     name,
-                    Float.toString(value),
-                    Float.toString(reliability),
-                    culturalCondition)
+                    getText(R.string.valueText) +  Float.toString(value),
+                    getText(R.string.reliabitityText) +Float.toString(reliability),
+                    getText(R.string.culturalCondition) + culturalCondition)
             );
         }
     }

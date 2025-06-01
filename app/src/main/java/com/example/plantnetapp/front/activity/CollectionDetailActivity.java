@@ -3,6 +3,7 @@ package com.example.plantnetapp.front.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -64,7 +65,7 @@ public class CollectionDetailActivity extends AppCompatActivity {
             collection = foundCollection;
             getCollectionPlants(this::setUp);
 
-            ImageButton btnBack = findViewById(R.id.btnBackCollection);
+            Button btnBack = findViewById(R.id.btnBackCollection);
             btnBack.setOnClickListener(v -> finish());
 
             TextView tv = findViewById(R.id.tvCollectionDetailTitle);

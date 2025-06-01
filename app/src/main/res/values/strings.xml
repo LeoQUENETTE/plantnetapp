@@ -40,4 +40,21 @@
     <string name="valueText">- Valeur :</string>
     <string name="reliabitityText">- Fiabilité :</string>
     <string name="culturalCondition">- Condition :</string>
+    <string name="waitingConnServer">Connecting to server...</string>
+    <string name="userAuth">Authenticating user...</string>
+    <string name="finalizing">Bientôt fini...</string>
+    <string name="deletionImpossible">Impossible de supprimer cet élément</string>
+    <string name="confirmDeletion">Confirmer la suppression</string>
+    <string name="sureDeletion">Voulez-vous vraiment supprimer cette plante ?</string>
+    <string name="deletionError">Erreur lors de la suppression</string>
+    <string name="no">Non</string>
+    <string name="searchPlant">Rechercher une plante...</string>
+    <string name="english">Anglais</string>
+    <string name="french">Français</string>
+    <string name="language_title">Langues</string>
+    <string name="confirm">Confirmer</string>
+    <string name="takePhoto">Prendre</string>
+    <string name="nitrogen_provision">Apport en nitrogène</string>
+    <string name="storage_gain_water">Capture et apport en eau</string>
+    <string name="soil_structuration">Aide à la structure du sol\n</string>
 </resources>

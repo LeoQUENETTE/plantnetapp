@@ -2,6 +2,8 @@ package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -18,6 +20,8 @@ import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.entity.PlantCollection;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.tables.PlantCollectionTable;
+import com.example.plantnetapp.back.tables.Table;
 import com.example.plantnetapp.front.adapter.CollectionAdapter;
 import com.example.plantnetapp.front.adapter.HistoryAdapter;
 
@@ -31,6 +35,8 @@ public class HistoriqueActivity extends AppCompatActivity {
     private CollectionAdapter collectionAdapter;
     private PlantCollection history;
     private List<Plant> historyPlants;
+    private boolean isconnected;
+    private PlantCollectionTable collectionTable;
     private final ActivityResultLauncher<Intent> updateHistoryAdapter =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() != RESULT_OK) {
@@ -69,6 +75,10 @@ public class HistoriqueActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_historique);
         User user = (User) getIntent().getSerializableExtra("connected_user");
+        collectionTable = PlantCollectionTable.getInstance();
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isconnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
         if (user != null){
             connectedUser = user;
         }else{
@@ -151,24 +161,34 @@ public class HistoriqueActivity extends AppCompatActivity {
         executor.shutdown();
     }
     private void createCollections(){
-        List<PlantCollection> collections = PlantCollection.getAllPlantCollection(connectedUser.id);
+        List<PlantCollection> collections;
+        if (isconnected){
+            collections = PlantCollection.getCollectionsNoHistory(connectedUser.id);
+        }else{
+            try {
+                collections = collectionTable.selectAllWithoutHistory(connectedUser.id);
+            }catch (Table.EmptyTableException exception){
+                collections =null;
+            }
+        }
+        List<PlantCollection> finalCollections = collections;
         runOnUiThread(() -> {
             RecyclerView rvCols = findViewById(R.id.rvCollections);
             rvCols.setLayoutManager(new LinearLayoutManager(this));
-            if (collections != null && !collections.isEmpty() && collectionAdapter == null){
-                collectionAdapter = new CollectionAdapter(collections, col -> {
+            if (finalCollections != null && !finalCollections.isEmpty() && collectionAdapter == null){
+                collectionAdapter = new CollectionAdapter(finalCollections, col -> {
                     Intent i = new Intent(HistoriqueActivity.this, CollectionDetailActivity.class);
                     i.putExtra("selected_collection", col);
                     i.putExtra("connected_user", connectedUser);
                     updateCollectionAdapter.launch(i);
                 });
             } else if (collectionAdapter != null) {
-                collectionAdapter.updateValue(collections);
+                collectionAdapter.updateValue(finalCollections);
             }
             rvCols.setAdapter(collectionAdapter);
             Button btnDelete = findViewById(R.id.btnDelete);
             btnDelete.setOnClickListener(v -> {
-                deletePlantCollections(collections);
+                deletePlantCollections(finalCollections);
             });
         });
     }
@@ -185,7 +205,10 @@ public class HistoriqueActivity extends AppCompatActivity {
         for (PlantCollection c : selectedCollections) {
             executor.submit(() -> {
                 try {
-                    PlantCollection.deleteCollection(connectedUser.id, c.name);
+                    if (isconnected){
+                        PlantCollection.deleteCollection(connectedUser.id, c.name);
+                    }
+                    collectionTable.deleteCollection(connectedUser.id, c.name);
                 } catch (Exception e) {
                     Log.e("DeleteError", "Failed to delete collection", e);
                 }
@@ -202,7 +225,7 @@ public class HistoriqueActivity extends AppCompatActivity {
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
                 List<PlantCollection> updatedCollections =
-                        PlantCollection.getAllPlantCollection(connectedUser.id);
+                        PlantCollection.getCollectionsNoHistory(connectedUser.id);
 
                 runOnUiThread(() -> {
                     if (collectionAdapter != null) {

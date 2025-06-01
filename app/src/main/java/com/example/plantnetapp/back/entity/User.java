@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class User extends Entity implements Serializable {
-    public final String id;
+    public String id;
     public final String login;
     public String mdp;
     public final String firstName;
@@ -21,14 +21,6 @@ public class User extends Entity implements Serializable {
         this.id = id;
         this.login = login;
         this.mdp = mdp;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.mail = mail;
-        this.phone = phone;
-    }
-    public User(String id, String login, String firstName, String lastName, String mail, String phone) {
-        this.id = id;
-        this.login = login;
         this.firstName = firstName;
         this.lastName = lastName;
         this.mail = mail;
@@ -60,11 +52,12 @@ public class User extends Entity implements Serializable {
     public static User userFromJSON(JsonObject object){
         String id = object.getAsJsonObject("User").get("id").getAsString();
         String username = object.getAsJsonObject("User").get("username").getAsString();
+        String pswrd = object.getAsJsonObject("User").get("pswrd").getAsString();
         String email = object.getAsJsonObject("User").get("email").getAsString();
         String firstname = object.getAsJsonObject("User").get("firstname").getAsString();
         String lastname = object.getAsJsonObject("User").get("lastname").getAsString();
         String phone = object.getAsJsonObject("User").get("phone").getAsString();
-        return new User(id, username, firstname, lastname, email, phone);
+        return new User(id, username, pswrd,firstname, lastname, email, phone);
     }
 
     public static User login(String username ,String pswrd){
@@ -87,6 +80,24 @@ public class User extends Entity implements Serializable {
             return response.status == 200;
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    public static String addUser(User user){
+        ExternalBDDApi api = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = api.addUser(user);
+            return response.values.get("id").getAsString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    public static void addUserWithID(User user){
+        ExternalBDDApi api = ExternalBDDApi.createInstance();
+        try{
+            ReturnType response = api.addUserWithID(user);
+        } catch (IOException e) {
+            return;
         }
     }
 }

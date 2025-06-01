@@ -1,6 +1,8 @@
 package com.example.plantnetapp.front.activity;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -9,8 +11,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.plantnetapp.R;
+import com.example.plantnetapp.back.DBHelper;
 import com.example.plantnetapp.back.api.ExternalBDDApi;
 import com.example.plantnetapp.back.entity.User;
+import com.example.plantnetapp.back.tables.UserTable;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -19,18 +23,20 @@ import java.util.concurrent.Executors;
 public class RegisterActivity extends AppCompatActivity {
     private EditText etUsername, etFirstName, etLastName, etPswrd, etMail, etPhone;
     private static final String TAG = "RegisterActivity";
-
+    private boolean isConnected;
+    private UserTable userTable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // 1) Cacher la barre d’action
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
         setContentView(R.layout.activity_register);
 
-        // 2) Liaison des champs
+        DBHelper db = DBHelper.getInstance(this,null);
+        userTable = UserTable.getInstance();
+
         etUsername = findViewById(R.id.etLogin);
         etFirstName = findViewById(R.id.etFirstName);
         etLastName  = findViewById(R.id.etLastName);
@@ -79,18 +85,18 @@ public class RegisterActivity extends AppCompatActivity {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             User newUser = new User(null, username, pswrd,firstname,lastname,mail, phone);
-            ExternalBDDApi api = ExternalBDDApi.createInstance();
+            ConnectivityManager cm = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            isConnected = (activeNetwork != null) && activeNetwork.isConnectedOrConnecting();
+            if (isConnected){
+                newUser.id = User.addUser(newUser);
+            }
             try {
-                api.addUser(newUser);
-            } catch (IOException e) {
+                userTable.addData(newUser);
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            runOnUiThread(() -> {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            });
+            runOnUiThread(this::finish);
         });
     }
 }

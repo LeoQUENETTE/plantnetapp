@@ -53,4 +53,16 @@ public abstract class Table {
             return false;
         }
     }
+    public static class EmptyTableException extends Exception{
+        public EmptyTableException() {
+        }
+
+        public EmptyTableException(String message) {
+            super(message);
+        }
+
+        public EmptyTableException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

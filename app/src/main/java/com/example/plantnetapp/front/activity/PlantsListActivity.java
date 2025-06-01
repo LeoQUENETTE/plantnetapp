@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.plantnetapp.R;
 import com.example.plantnetapp.back.entity.Plant;
 import com.example.plantnetapp.back.CsvParser;
+import com.example.plantnetapp.back.entity.User;
 import com.example.plantnetapp.front.adapter.PlantAdapter;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 public class PlantsListActivity extends AppCompatActivity {
     private PlantAdapter adapter;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,10 @@ public class PlantsListActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_plants_list);
 
+        User foundUser  = (User) getIntent().getSerializableExtra("user");
+        if (foundUser != null) {
+            user = foundUser;
+        }
         // Bouton Retour
         Button btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -68,7 +74,9 @@ public class PlantsListActivity extends AppCompatActivity {
 
     private void openDetailFor(Plant plant) {
         Intent i = new Intent(this, DetailActivity.class);
+        i.putExtra("user", user);
         i.putExtra("plant", plant);
+        i.putExtra("fromList", true);
         startActivity(i);
     }
 }

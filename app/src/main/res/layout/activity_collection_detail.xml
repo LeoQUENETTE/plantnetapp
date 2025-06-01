@@ -27,21 +27,22 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="12dp">
 
-            <ImageButton
+            <Button
                 android:id="@+id/btnBackCollection"
                 android:layout_width="150dp"
                 android:layout_height="60dp"
-                android:contentDescription="Retour"
+                android:text="@string/goBack"
+                android:textColor="#3A4E3A"
                 android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <TextView
                 android:id="@+id/tvCollectionDetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nom de la collection"
+                android:text="@string/collection_name"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="#3A4E3A"
                 android:layout_marginStart="12dp"/>
         </LinearLayout>
 
@@ -50,7 +51,7 @@
             android:id="@+id/svCollection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rechercher une plante…"
+            android:text="@string/searchPlant"
             android:queryHint="Rechercher une plante…"
             android:iconifiedByDefault="false"
             android:background="#80000000"
